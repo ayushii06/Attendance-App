@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         validate: {
             validator: function (value) {
-                return value.endsWith("@rgipt.ac.in");
+                return value.endsWith("@gmail.com") || value.endsWith("@rgipt.ac.in");
             },
             message: "Email must end with @rgipt.ac.in",
         },
@@ -55,18 +55,17 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Profile",
     },
-    courses: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Course",
-            validate: {
-                validator: function () {
-                    return this.accountType === "Student" || this.accountType === "Instructor";
-                },
-                message: "Courses are only applicable for students and instructor.",
+    courses: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+        validate: {
+            validator: function () {
+                return this.accountType === "Student" || this.accountType === "Instructor";
             },
+            message: "Courses are only applicable for students and instructor.",
         },
-    ],
+    }],
+    
     image: {
         type: String,
         required: true,

@@ -1,4 +1,5 @@
 const Attendance = require("../models/Attendance");
+const Course = require("../models/Course");
 const User = require("../models/User");
 
 function isWithin100Meters(userLat, userLon, centerLat, centerLon) {
@@ -36,8 +37,8 @@ let attendanceSession = {
     isActive: false,
     expiresAt: null,
     course:null,
-    centerLat : NULL,
-    centerLon : NULL,
+    centerLat : null,
+    centerLon : null,
 };
 
 // Start Attendance Session
@@ -72,9 +73,9 @@ exports.startAttendance = async(req, res) => {
 };
 
 // Mark Attendance
-exports.markAttendance = async(req, res) => {
+exports.markAttendance = async (req, res) => {
     const userId = req.user.id;
-    const {course,latitude,longitude} = req.body;
+    const { course, latitude, longitude } = req.body;
 
     if (!userId) {
         return res.status(400).json({ error: "User ID is required. Login Again" });
@@ -84,47 +85,46 @@ exports.markAttendance = async(req, res) => {
         return res.status(403).json({ error: "Attendance session is not active or has expired" });
     }
 
-    if(!course || course!==attendanceSession.course){
+    if (!course || course !== attendanceSession.course) {
         return res.status(404).json({
-            success:false,
-            message:"Attendance for this Course is not available now",
-            error:error.message,
+            success: false,
+            message: "Attendance for this Course is not available now",
         });
     }
 
-    if(!latitude||!longitude){
+    if (!latitude || !longitude) {
         return res.status(404).json({
-            success:false,
-            message:"Location details not found",
-            error:error.message,
+            success: false,
+            message: "Location details not found",
         });
     }
 
-    
     if (isWithin100Meters(latitude, longitude, attendanceSession.centerLat, attendanceSession.centerLon)) {
         const user = await User.findById(userId);
-        if(!user){
+        if (!user) {
             return res.status(404).json({
-                success:false,
-                message:"User not found with this id. Login Again",
-                error:error.message,
+                success: false,
+                message: "User not found with this ID. Login Again",
             });
         }
-        const newAttendance = await Attendance.create({
-            userId:userId,
-            courseId:course,
-            year:user.year,
-            branch:user.branch,
-            mark:true,
-            date:Date.now(),
+
+        await Attendance.create({
+            userId,
+            courseId: course,
+            year: user.year,
+            branch: user.branch,
+            mark: true, // Attendance marked as present
+            date: Date.now(),
         });
-        console.log("User is within 100 meters of the center.");
-    } 
-    else {
-        console.log("User is outside the 100 meters radius.Attendance marked absent Try again");
+
+        return res.status(200).json({ message: `Attendance marked as present for user ${userId}` });
+    } else {
+        return res.status(400).json({
+            message: "User is outside the 100-meter radius. Attendance not marked.",
+        });
     }
-    res.status(200).json({ message: `Attendance marked for user ${userId}` });
 };
+
 
 // Stop Attendance Session
 exports.stopAttendance = (req, res) => {
@@ -135,35 +135,27 @@ exports.stopAttendance = (req, res) => {
     res.status(200).json({ message: "Attendance session stopped" });
 };
 
-//branch course attendance
-//only for instructor or admin
-exports.getCourseAttendance = async(req,res)=>{
-    try{
-        const userId = req.user.id;
-        if(!userId){
-            return res.status(402).json({
-                success:false,
-                message:"User Id not found",
-                error:error.message,
-            });
-        }
-        const user = await User.findById(userId);
-        if(!user || user.role==="Student"){
-            return res.status(404).json({
-                success:false,
-                message:"User not found. Login with Admin or Instructor Id",
-                error:error.message,
-            });
-        }
-        const {course,year,branch} = req.body;
-        const attendanceRecords = await Attendance.find({courseId:course,year:year,branch:branch}).populate({
-            path: "userId",
-            select:"rollNo firstName lastName"
-        }).populate("courseId")
-        .exec();
+// Branch course attendance
+// Only for instructor or admin
+exports.getCourseAttendance = async (req, res) => {
+    try {
+        const { course, year, branch } = req.body;
+
+        const attendanceRecords = await Attendance.find({
+            courseId: course,
+            year,
+            branch,
+        })
+            .populate({
+                path: "userId",
+                select: "rollNo firstName lastName",
+            })
+            .populate("courseId")
+            .exec();
+
         const normalizedRecords = attendanceRecords.map((record) => {
             const normalizedDate = new Date(record.date);
-            normalizedDate.setUTCHours(0, 0, 0, 0); // Set to start of the day
+            normalizedDate.setUTCHours(0, 0, 0, 0); // Normalize date to start of the day
             return {
                 ...record._doc,
                 date: normalizedDate, // Replace the date with the normalized day-wise date
@@ -175,81 +167,79 @@ exports.getCourseAttendance = async(req,res)=>{
             if (a.date.getTime() !== b.date.getTime()) {
                 return a.date - b.date; // Sort by date (ascending)
             }
-            return a.studentId.rollNumber - b.studentId.rollNumber; // Sort by roll number (ascending)
+            return a.userId.rollNo - b.userId.rollNo; // Sort by roll number (ascending)
         });
 
         return res.status(200).json({
-            success:true,
-            message:"All Students of branch fetched successfully",
+            success: true,
+            message: "Attendance fetched successfully",
             normalizedRecords,
         });
-    }
-    catch(error){
+    } catch (error) {
         res.status(500).json({
-            success:false,
-            message:"Failed to get attendance of required course",
-            error:error.message,
+            success: false,
+            message: "Failed to get attendance for the specified course",
+            error: error.message,
         });
     }
-}
+};
 
-//student own attendance records course wise
+
+// Student own attendance records course-wise
 exports.getStudentAttendanceByCourse = async (req, res) => {
     try {
-        const userId= req.user.id; 
-        const {course} = req.body;
+        const userId = req.user.id;
+        const { course } = req.body;
 
-        // Validate input
         if (!userId || !course) {
             return res.status(400).json({ error: "Student ID and Course ID are required." });
         }
 
-        // Check if the student exists
         const student = await User.findById(userId).populate("courses");
         if (!student) {
             return res.status(404).json({ error: "Student not found." });
         }
 
-        // Verify the course is in the student's enrolled courses
-        const enrolledCourse = student.courses.find((courseId) => courseId._id.toString() === courseId);
+        const enrolledCourse = student.courses.find(
+            (courseId) => courseId._id.toString() === course.toString()
+        );
         if (!enrolledCourse) {
             return res.status(400).json({ error: "Student is not enrolled in the specified course." });
         }
 
-        const noOfLectures = await Course.findById({courseId:course}).lectures;
+        const courseDetails = await Course.findById(course);
+        if (!courseDetails) {
+            return res.status(404).json({ error: "Course not found." });
+        }
 
-        // Fetch attendance records for the given student and course
         const attendanceRecords = await Attendance.find({
             userId,
-            courseId:course,
+            courseId: course,
         }).exec();
 
-        // Normalize dates to day-wise (ignoring time)
         const normalizedRecords = attendanceRecords.map((record) => {
             const normalizedDate = new Date(record.date);
-            normalizedDate.setUTCHours(0, 0, 0, 0); // Set to start of the day
+            normalizedDate.setUTCHours(0, 0, 0, 0); // Normalize date
             return {
                 ...record._doc,
-                date: normalizedDate, // Replace the date with the normalized day-wise date
+                date: normalizedDate,
             };
         });
 
-        // Count the number of true-marked attendance records
-        const trueMarkedCount = attendanceRecords.filter((record) => record.mark === true).length;
+        const trueMarkedCount = normalizedRecords.filter((record) => record.mark === true).length;
 
-        // Sort attendance records by date (ascending)
-        normalizedRecords.sort((a, b) => a.date - b.date);
+        normalizedRecords.sort((a, b) => a.date - b.date); // Sort by date
 
-        // Return the result
         res.status(200).json({
-            student: student.name,
-            course: enrolledCourse.name,
+            student: `${student.firstName} ${student.lastName}`,
+            course: courseDetails.courseName,
             attendance: normalizedRecords,
-            noOfPresent:trueMarkedCount,
-            noOfLectures:noOfLectures,
+            noOfPresent: trueMarkedCount,
+            noOfLectures: courseDetails.lectures,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Error while fetching Student attendance record." });
+        res.status(500).json({ error: "Error while fetching student attendance records." });
     }
 };
+
