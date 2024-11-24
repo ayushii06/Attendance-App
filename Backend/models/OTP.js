@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const { sendVerificationEmail } = require("./emailService"); 
+const mailSender = require("../utils/mailSender");
+const { emailVerificationTemplate } = require("../mail/templates/emailVerificationTemplate");
 
 const OTPSchema = new mongoose.Schema({
     email: {
@@ -24,6 +25,19 @@ const OTPSchema = new mongoose.Schema({
 });
 
 OTPSchema.index({ email: 1 }); // Index for faster queries
+
+
+//mail to user //db me entry hone se phle
+async function sendVerificationEmail(email,otp){
+    try{
+        const mailResponse = await mailSender(email, "Verification Email from Parikshit", emailVerificationTemplate(otp));
+        console.log("Email sent Successfully", mailResponse);
+    }
+    catch(error){
+        console.log("Error occured while Sending mail of OTP ", error);
+        throw error;
+    }
+}
 
 // Pre-save middleware to send OTP email
 OTPSchema.pre("save", async function (next) {
