@@ -3,7 +3,9 @@ const app = express();
 
 
 const userRoutes = require("./routes/User");
-
+const branchRoutes = require("./routes/Branch");
+const courseRoutes = require("./routes/Course");
+const attendanceRoutes = require("./routes/Attendance");
 
 const database = require("./config/database");
 const cookieParser = require("cookie-parser");
@@ -34,7 +36,10 @@ app.use(
 cloudinaryConnect();
 
 
-app.use("/api/v1/auth" , userRoutes)
+app.use("/api/v1/auth" , userRoutes);
+app.use("/api/v1/branch" , branchRoutes);
+app.use("/api/v1/course" , courseRoutes);
+app.use("/api/v1/attendance" , attendanceRoutes);
 
 app.get("/",(req,res)=>{
     return res.json({

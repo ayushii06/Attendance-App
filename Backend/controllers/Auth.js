@@ -61,7 +61,7 @@ exports.signUp = async (req, res) => {
         } = req.body;
 
         // Check if all fields are filled
-        if (!firstName || !lastName || !email || !password || !confirmPassword || !otp || !rollNo || !year || !branch) {
+        if (!firstName || !lastName || !email || !password || !confirmPassword || !otp) {
             return res.status(403).json({
                 success: false,
                 message: "All fields are not filled",
@@ -103,15 +103,19 @@ exports.signUp = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Fetch branch and associated courses
-        const branchDetails = await Branch.findOne({ name: branch,year:year}).populate('courses');
-        if (!branchDetails) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid branch',
-            });
+        let branchDetails = null;
+        if(accountType === "Student"){
+
+            branchDetails = await Branch.findOne({ name: branch,year:year});
+            if (!branchDetails) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid branch',
+                });
+            }
+            // Extract course references
+            // const courses = branchDetails.courses.map(course => course._id);
         }
-        // Extract course references
-        const courses = branchDetails.courses.map(course => course._id);
 
         // Create profile details
         const profileDetails = await Profile.create({
@@ -130,15 +134,17 @@ exports.signUp = async (req, res) => {
             accountType,
             additionalDetails: profileDetails._id,
             image: `https://api.dicebar.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
-            rollNo,
-            year,
-            branch,
-            courses, // Add courses as references
+            rollNo:accountType==="Student"?rollNo:null,
+            year:accountType==="Student"?year:null,
+            branch:accountType==="Student"?branchDetails._id:null,
+            courses:accountType==="Student"?branchDetails.courses:[], // Add courses as references
         });
         
          // Add student to the branch's student array
-         branchDetails.student.push(user._id);
-         await branchDetails.save();
+        if(accountType==="Student"){
+            branchDetails.student.push(user._id);
+            await branchDetails.save();
+        }
 
         return res.status(200).json({
             success: true,

@@ -1,5 +1,4 @@
-const Branch = require("../models/Category");
-const User = require("../models/User");
+const Branch = require("../models/Branch");
 
 //create Branch
 exports.createBranch = async (req,res)=>{
@@ -59,10 +58,10 @@ exports.showAllBranch = async(req,res)=>{
 exports.showBranchDetails = async (req, res) => {
     try {
         // Extract branch ID from request body
-        const { branch,year } = req.body;
+        const { branchId } = req.body;
 
         // Fetch the branch and populate its students sorted by roll number
-        const branchDetails = await Branch.find({branch:branch,year:year}).populate({
+        const branchDetails = await Branch.findById(branchId).populate({
             path: "student",
             select: "rollNo firstName lastName",
             options: { sort: { rollNo: 1 } }, // Sort students by rollNo
@@ -80,8 +79,8 @@ exports.showBranchDetails = async (req, res) => {
             success: true,
             message: "Branch details fetched successfully.",
             branch: {
-                branchName: branchDetails.name, // Assuming `name` field exists in Branch model
-                year: branchDetails.year, // Assuming `year` field exists in Branch model
+                branchName: branchDetails.name, 
+                year: branchDetails.year, 
                 students: branchDetails.student, // Already sorted
             },
         });

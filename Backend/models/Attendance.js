@@ -1,39 +1,42 @@
 const mongoose = require("mongoose");
 
 const attendance = new mongoose.Schema({
-    userId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true,
-    },
-    courseId:{
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:"Course",
-        required:true,
+        ref: "User",
+        required: true,
     },
-    instructor:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true,
+    courseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+        required: true,
     },
-    year:{
-        type:Number,
-        required:true,
+    instructor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
-    branch:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Branch",
-        required:true,
+    year: {
+        type: Number,
+        required: true,
     },
-    mark:{
-        type:Bool,
-        default:false,
+    branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Branch",
+        required: true,
     },
-    date:{
-        type:Date,
-        default:Date.now(),
-        required:true,
-    }
+    mark: {
+        type: Boolean,
+        default: false,
+    },
+    date: {
+        type: Date,
+        default: Date.now, // Corrected default value
+        required: true,
+    },
 });
+
+// Add indexes to improve query performance
+attendance.index({ userId: 1, courseId: 1, date: 1 });
 
 module.exports = mongoose.model("Attendance", attendance);

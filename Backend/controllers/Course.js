@@ -1,5 +1,5 @@
 const Course = require("../models/Course");
-const Branch = require("../models/Category");
+const Branch = require("../models/Branch");
 const User = require("../models/User");
 
 exports.createCourse = async (req, res) => {
@@ -34,13 +34,13 @@ exports.createCourse = async (req, res) => {
             whatYouWillLearn,
             year,
             lectures,
-            Branch: branchDetails,
+            branch: branchDetails,
         });
 
         // Add the course to the instructor's course list
         await User.findByIdAndUpdate(
             instructor,
-            { $push: { courses: newCourse._id } },
+            { $addToSet: { courses: newCourse._id } }, // Add course reference to the set
             { new: true }
         );
 
@@ -51,6 +51,21 @@ exports.createCourse = async (req, res) => {
                     branchId,
                     { $push: { courses: newCourse._id } },
                     { new: true }
+                );
+            })
+        );
+        // Update the `courses` array for students in the branches
+        await Promise.all(
+            branchDetails.map(async (branchId) => {
+                const branch = await Branch.findById(branchId).populate("student");
+                await Promise.all(
+                    branch.student.map(async (studentId) => {
+                        await User.findByIdAndUpdate(
+                            studentId,
+                            { $addToSet: { courses: newCourse._id } }, // Avoid duplicate entries
+                            { new: true }
+                        );
+                    })
                 );
             })
         );
@@ -72,25 +87,42 @@ exports.createCourse = async (req, res) => {
 };
 
 //get all courses of a branch
-exports.getAllCourses = async (req,res)=>{
-    try{
-        const {branch,year} = req.body;
-        const allCourses = await Branch.find({name:branch,year:year}).populate({
-            path:"courses",
-            select:"courseName instructor lectures",
-        }).exec();
+exports.getAllCourses = async (req, res) => {
+    try {
+        // Extract branch ID from request body
+        const { branchId } = req.body;
+
+        // Fetch branch details and populate only courses
+        const branchDetails = await Branch.findById(branchId)
+            .select("name year courses") // Select only specific fields
+            .populate({
+                path: "courses",
+                select: "courseName instructor lectures", // Populate specific course fields
+            })
+            .exec();
+
+        // Check if the branch exists
+        if (!branchDetails) {
+            return res.status(404).json({
+                success: false,
+                message: "Branch not found.",
+            });
+        }
+
         return res.status(200).json({
-            success:true,
-            message:'All courses fetched Successfully',
-            allCourses,
-        })
-    }
-    catch(error){
-        console.log(error);
+            success: true,
+            message: "Branch courses fetched successfully.",
+            branch: {
+                branchName: branchDetails.name,
+                year: branchDetails.year,
+                courses: branchDetails.courses,
+            },
+        });
+    } catch (error) {
+        console.error("Error fetching branch courses:", error);
         return res.status(500).json({
-            success:false,
-            message:'Cannot fetch Courses',
-            error:error.message,
-        })
+            success: false,
+            message: "Error while getting branch courses.",
+        });
     }
-};
+}
