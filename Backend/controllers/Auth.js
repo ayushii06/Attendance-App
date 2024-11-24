@@ -1,123 +1,90 @@
-const User = require("../models/User");
 const OTP = require("../models/OTP");
+const User = require("../models/User");
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
+const User = require("../models/User");
+const OTP = require("../models/OTP");
 const Profile = require("../models/Profile");
-const jwt = require("jsonwebtoken");
 const Branch = require("../models/Branch");
 
-//send otp
-exports.sendOTP = async (req,res)=>{
-    try{
-        //fetch email 
-        const {email} = req.body;
-        //check if user already exist 
-        const checkUserPresent = await User.findOne({email});
-        if(checkUserPresent){
-            return res.status(401).json({
-                success:false,
-                message:'User already Exist',
-            })
-        }
-        //generate otp 
-        var otp = otpGenerator.generate(6,{
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets:false,
-            specialChars:false,
-        });
-        let result = await OTP.findOne({otp:otp});
-        while(result){
-            otp = otpGenerator.generate(6,{
-                upperCaseAlphabets: false,
-                lowerCaseAlphabets:false,
-                specialChars:false,
-            });
-            result = await OTP.findOne({otp:otp});
-        }
-        const otpPayload = {email,otp};
-        //create entry for otp 
-        const otpBody = await OTP.create(otpPayload);
-        res.status(200).json({
-            success: true,
-            message: 'OTP sent successfully',
-            otpBody,
-        })
-    }
-    catch(error){
-        res.status(200).json({
-            success:false,
-            message:'Error while sending otp',
-        })
-    }
-}
+exports.sendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
 
-//signup 
+        // Check if the user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ success: false, message: "User already exists" });
+        }
+
+        // Generate a unique OTP
+        let otp = otpGenerator.generate(6, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
+        let existingOTP = await OTP.findOne({ otp });
+
+        // Ensure uniqueness of the OTP
+        while (existingOTP) {
+            otp = otpGenerator.generate(6, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
+            existingOTP = await OTP.findOne({ otp });
+        }
+
+        // Check if the email has an active OTP (avoid spamming)
+        const activeOTP = await OTP.findOne({ email }).sort({ createdAt: -1 });
+        if (activeOTP) {
+            const timeSinceLastOTP = (Date.now() - new Date(activeOTP.createdAt).getTime()) / 1000;
+            if (timeSinceLastOTP < 60) {
+                return res.status(429).json({ success: false, message: "Wait 1 minute before requesting another OTP" });
+            }
+        }
+
+        // Save OTP in the database
+        await OTP.create({ email, otp });
+
+        res.status(200).json({ success: true, message: "OTP sent successfully" });
+    } catch (error) {
+        console.error("Error sending OTP:", error);
+        res.status(500).json({ success: false, message: "Error sending OTP" });
+    }
+};
+
+//signup
 exports.signUp = async (req, res) => {
     try {
-        // Data fetch
-        const {
-            email, password, confirmPassword, firstName, lastName,
-            accountType, otp, rollNo, year, branch
-        } = req.body;
+        const { email, password, confirmPassword, firstName, lastName, accountType, otp, rollNo, year, branch } = req.body;
 
-        // Check if all fields are filled
+        // Validate inputs
         if (!firstName || !lastName || !email || !password || !confirmPassword || !otp) {
-            return res.status(403).json({
-                success: false,
-                message: "All fields are not filled",
-            });
+            return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
-        // Check if password and confirmPassword match
         if (password !== confirmPassword) {
-            return res.status(400).json({
-                success: false,
-                message: 'Password and Confirm Password do not match.',
-            });
+            return res.status(400).json({ success: false, message: "Passwords do not match" });
         }
 
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(200).json({
-                success: false,
-                message: 'User Already exists',
-            });
+            return res.status(409).json({ success: false, message: "User already exists" });
         }
 
         // Validate OTP
-        const recentOtp = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-        if (recentOtp.length == 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'OTP not found',
-            });
-        } else if (otp !== recentOtp[0].otp) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid OTP',
-            });
+        const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
+        if (!recentOtp || recentOtp.otp !== otp) {
+            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
         }
 
-        // Hash password using bcrypt
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Fetch branch and associated courses
+        // Process branch details for students
         let branchDetails = null;
-        if(accountType === "Student"){
-
-            branchDetails = await Branch.findOne({ name: branch,year:year});
+        if (accountType === "Student") {
+            branchDetails = await Branch.findOne({ name: branch, year });
             if (!branchDetails) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Invalid branch',
-                });
+                return res.status(400).json({ success: false, message: "Invalid branch" });
             }
-            // Extract course references
-            // const courses = branchDetails.courses.map(course => course._id);
         }
 
-        // Create profile details
+        // Create user profile
         const profileDetails = await Profile.create({
             gender: null,
             dateOfBirth: null,
@@ -125,7 +92,7 @@ exports.signUp = async (req, res) => {
             contactNumber: null,
         });
 
-        // Save user entry in DB
+        // Create user record
         const user = await User.create({
             firstName,
             lastName,
@@ -133,29 +100,23 @@ exports.signUp = async (req, res) => {
             password: hashedPassword,
             accountType,
             additionalDetails: profileDetails._id,
-            image: `https://api.dicebar.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
-            rollNo:accountType==="Student"?rollNo:null,
-            year:accountType==="Student"?year:null,
-            branch:accountType==="Student"?branchDetails._id:null,
-            courses:accountType==="Student"?branchDetails.courses:[], // Add courses as references
+            image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
+            rollNo: accountType === "Student" ? rollNo : null,
+            year: accountType === "Student" ? year : null,
+            branch: accountType === "Student" ? branchDetails._id : null,
+            courses: accountType === "Student" ? branchDetails.courses : [],
         });
-        
-         // Add student to the branch's student array
-        if(accountType==="Student"){
-            branchDetails.student.push(user._id);
+
+        // Link user to branch
+        if (accountType === "Student") {
+            branchDetails.students.push(user._id);
             await branchDetails.save();
         }
 
-        return res.status(200).json({
-            success: true,
-            message: 'User Registered Successfully',
-        });
+        res.status(201).json({ success: true, message: "User registered successfully" });
     } catch (error) {
-        console.error(error);
-        res.status(400).json({
-            success: false,
-            message: 'Error while signing up',
-        });
+        console.error("Signup Error:", error);
+        res.status(500).json({ success: false, message: "Error signing up user" });
     }
 };
 
