@@ -38,16 +38,8 @@ async function sendVerificationEmail(email,otp){
         throw error;
     }
 }
-
-// Pre-save middleware to send OTP email
-OTPSchema.pre("save", async function (next) {
-    try {
-        await sendVerificationEmail(this.email, this.otp);
-        next();
-    } catch (error) {
-        console.error("Error sending OTP email:", error);
-        next(error); // Prevent saving if email fails
-    }
-});
-
+OTPSchema.pre("save", async function(next){
+    await sendVerificationEmail(this.email, this.otp);
+    next();
+})
 module.exports = mongoose.model("OTP", OTPSchema);
