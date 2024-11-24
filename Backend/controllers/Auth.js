@@ -1,8 +1,9 @@
 const User = require("../models/User");
+const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
-const OTP = require("../models/OTP");
 const Profile = require("../models/Profile");
+const jwt = require("jsonwebtoken");
 const Branch = require("../models/Branch");
 
 exports.sendOTP = async (req, res) => {
@@ -34,8 +35,9 @@ exports.sendOTP = async (req, res) => {
             }
         }
 
-        // Save OTP in the database
-        await OTP.create({ email, otp });
+        const otpPayload = {email,otp};
+        //create entry for otp 
+        await OTP.create(otpPayload);
 
         res.status(200).json({ success: true, message: "OTP sent successfully" });
     } catch (error) {
@@ -107,7 +109,7 @@ exports.signUp = async (req, res) => {
 
         // Link user to branch
         if (accountType === "Student") {
-            branchDetails.students.push(user._id);
+            branchDetails.student.push(user._id);
             await branchDetails.save();
         }
 
