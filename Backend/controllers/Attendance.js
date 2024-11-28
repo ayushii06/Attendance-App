@@ -1,4 +1,5 @@
 const Attendance = require("../models/Attendance");
+const AttendanceSession = require("../models/AttendanceSession");
 const Course = require("../models/Course");
 const User = require("../models/User");
 
@@ -33,73 +34,146 @@ function isWithin100Meters(userLat, userLon, centerLat, centerLon) {
     return distance <= 100;
 }
 
-let attendanceSession = {
-    isActive: false,
-    expiresAt: null,
-    course:null,
-    centerLat : null,
-    centerLon : null,
-};
-
 // Start Attendance Session
 exports.startAttendance = async(req, res) => {
-    const { duration,latitude,longitude,course,year,branch } = req.body; // duration in minutes
-
-    if (!duration || typeof duration !== "number" || duration <= 0 || !course ||!year || !branch) {
-        return res.status(400).json({ error: "Invalid details, Login Again" });
-    }
-    if(!latitude || !longitude){
-        return res.status(404).json({
-            success:false,
-            message:"Location not found",
-            error:error.message,
+    try{
+        const userId = req.user.id;
+        const { duration,latitude,longitude,course,year,branch } = req.body; // duration in minutes
+    
+        if (!duration || typeof duration !== "number" || duration <= 0 || !course ||!year || !branch) {
+            return res.status(400).json({ error: "Invalid details, Login Again" });
+        }
+        if(!latitude || !longitude){
+            return res.status(404).json({
+                success:false,
+                message:"Location not found",
+                error:error.message,
+            });
+        }
+        const reqCourse = await Course.findById(course);
+        console.log(reqCourse.instructor.toString());
+        if(reqCourse.instructor.toString()!==userId){
+            return res.status(404).json({
+                success:false,
+                message:"Course is not yours",
+            })
+        }
+    
+        // End any existing active sessions for the same course
+        await AttendanceSession.updateMany(
+            { course, isActive: true },
+            { $set: { isActive: false } }
+        );
+    
+        // Set the expiration time
+        const now = new Date();
+        const session = new AttendanceSession({
+            isActive: true,
+            expiresAt: new Date(now.getTime() + duration * 60 * 1000),
+            course,
+            centerLat: latitude,
+            centerLon: longitude,
+            instructor:userId,
+        });
+    
+        await session.save();
+    
+    
+        res.status(200).json({
+            message: `Attendance session started for ${duration} minutes.`,
+            session,
         });
     }
+    catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Error while creating attendance session",
+            error:error.message,
+        })
+    }
+};
 
-    // Set the expiration time
-    const now = new Date();
-    attendanceSession.isActive = true;
-    attendanceSession.expiresAt = new Date(now.getTime() + duration * 60 * 1000); // Add duration in ms
-    attendanceSession.course = course;
+// Update Attendance Session Expiration Time
+exports.updateAttendanceExpiration = async (req, res) => {
+    try {
+        const { course, newDuration } = req.body; // newDuration is in minutes
+    
+        if (!course || typeof newDuration !== "number" || newDuration <= 0) {
+            return res.status(400).json({ 
+                success:false,
+                message: "Invalid course ID or duration." 
+            });
+        }
+        // Find the active session for the given course
+        const session = await AttendanceSession.findOne({ course, isActive: true });
 
+        if (!session) {
+            return res.status(400).json({ 
+                success:false,
+                message: "No active session for the course. Create new session" 
+            });
+        }
 
-    attendanceSession.centerLat = latitude;
-    attendanceSession.centerLon = longitude;
+        // Calculate the new expiration time
+        const now = new Date();
+        const newExpiresAt = new Date(now.getTime() + newDuration * 60 * 1000);
 
-    res.status(200).json({
-        message: `Attendance session started for ${duration} minutes.`,
-        expiresAt: attendanceSession.expiresAt,
-    });
+        // Update the session's expiration time
+        session.expiresAt = newExpiresAt;
+        await session.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Session expiration time updated successfully.",
+            session: {
+                course: session.course,
+                newExpiresAt: session.expiresAt,
+            },
+        });
+    } 
+    catch (error) {
+        return res.status(400).json({ 
+            success:false,
+            message: "Error while updating time. Try again" 
+        });
+    }
 };
 
 // Mark Attendance
 exports.markAttendance = async (req, res) => {
-    const userId = req.user.id;
-    const { course, latitude, longitude } = req.body;
+    try{
+        const userId = req.user.id;
+        const { course, latitude, longitude } = req.body;
 
-    if (!userId) {
-        return res.status(400).json({ error: "User ID is required. Login Again" });
-    }
+        if(!course){
+            return res.status(404).json({
+                success: false,
+                message: "Course details not found",
+            });
+        }
+        
+        if (!latitude || !longitude) {
+            return res.status(404).json({
+                success: false,
+                message: "Location details not found. Enable location and try again",
+            });
+        }
+        // Fetch the active session for the course
+        const session = await AttendanceSession.findOne({ course, isActive: true });
+        console.log(session);
 
-    if (!attendanceSession.isActive || new Date() > attendanceSession.expiresAt) {
-        return res.status(403).json({ error: "Attendance session is not active or has expired" });
-    }
-
-    if (!course || course !== attendanceSession.course) {
-        return res.status(404).json({
-            success: false,
-            message: "Attendance for this Course is not available now",
-        });
-    }
-
-    if (!latitude || !longitude) {
-        return res.status(404).json({
-            success: false,
-            message: "Location details not found",
-        });
-    }
-
-    if (isWithin100Meters(latitude, longitude, attendanceSession.centerLat, attendanceSession.centerLon)) {
+        if (!session || new Date() > session.expiresAt) {
+            return res.status(404).json({
+                success: false,
+                message: "Attendance for this Course is not available now",
+            });
+        }
+    
+        if (!isWithin100Meters(latitude, longitude, session.centerLat, session.centerLon)) {
+            return res.status(400).json({
+                message: "User is outside the 100-meter radius. Attendance not marked.",
+            });
+        } 
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({
@@ -108,35 +182,77 @@ exports.markAttendance = async (req, res) => {
             });
         }
 
+        const attendanceExists = await Attendance.findOne({
+            userId,
+            courseId: course,
+            date: { $gte: new Date().setUTCHours(0, 0, 0, 0) },
+        });
+        if (attendanceExists) {
+            return res.status(400).json(
+                {
+                    error: "Attendance already marked for today." 
+                }
+            );
+        }
+
         await Attendance.create({
             userId,
             courseId: course,
+            instructor:session.instructor,
             year: user.year,
             branch: user.branch,
             mark: true, // Attendance marked as present
-            date: Date.now(),
+            date: new Date(),
         });
 
-        return res.status(200).json({ message: `Attendance marked as present for user ${userId}` });
-    } else {
-        return res.status(400).json({
-            message: "User is outside the 100-meter radius. Attendance not marked.",
+        return res.status(200).json({ 
+            success:true,
+            message: `Attendance marked as present for user ${userId}` 
         });
+    }
+    catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Error while marking attendance. Login again...",
+            error:error.message,
+        })
     }
 };
 
 
 // Stop Attendance Session
-exports.stopAttendance = (req, res) => {
-    attendanceSession.isActive = false;
-    attendanceSession.expiresAt = null;
-    attendanceSession.course = null;
+exports.stopAttendance = async (req, res) => {
+    try {
+        const { course } = req.body;
+        if (!course) {
+            return res.status(404).json({ 
+                success:false,
+                message: "No course found." 
+            });
+        }
+        const session = await AttendanceSession.findOne({ course, isActive: true });
+        if (!session) {
+            return res.status(404).json({ 
+                success:false,
+                error: "No active session found for the course." 
+            });
+        }
 
-    res.status(200).json({ message: "Attendance session stopped" });
+        session.isActive = false;
+        await session.save();
+
+        res.status(200).json({
+            success:true,
+            message: "Attendance session stopped."
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to stop attendance session." });
+    }
 };
 
 // Branch course attendance
-// Only for instructor or admin
+// Only for instructor 
 exports.getCourseAttendance = async (req, res) => {
     try {
         const { course, year, branch } = req.body;

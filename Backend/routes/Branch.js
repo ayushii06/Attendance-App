@@ -6,7 +6,7 @@ const { createBranch, showAllBranch, showBranchDetails } = require("../controlle
 
 router.post("/createBranch",auth,isAdmin,createBranch);
 
-router.get("/showAllBranch",auth,showAllBranch);
-router.get("/showBranchDetails",auth,showBranchDetails);
+router.post("/showAllBranch",auth,showAllBranch);
+router.post("/showBranchDetails",auth,showBranchDetails);
 
 module.exports = router;
