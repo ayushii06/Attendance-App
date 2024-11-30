@@ -30,7 +30,11 @@ const courseSchema = new mongoose.Schema({
     lectures:{
         type:Number,
         required:true,
-    }
+    },
+    lectureNo:{
+        //for calculation of percentage of attendance of student
+        type:Number,
+    },
 });
 
 module.exports = mongoose.model("Course", courseSchema);
