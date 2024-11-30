@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Attendance = require("../models/Attendance");
 const AttendanceSession = require("../models/AttendanceSession");
 const Course = require("../models/Course");
@@ -38,10 +39,13 @@ function isWithin100Meters(userLat, userLon, centerLat, centerLon) {
 exports.startAttendance = async(req, res) => {
     try{
         const userId = req.user.id;
-        const { duration,latitude,longitude,course,year,branch } = req.body; // duration in minutes
+        const { duration,latitude,longitude,course,year,branch,newLecture/*(true/false)*/ } = req.body; // duration in minutes
     
         if (!duration || typeof duration !== "number" || duration <= 0 || !course ||!year || !branch) {
-            return res.status(400).json({ error: "Invalid details, Login Again" });
+            return res.status(400).json({
+                success:false,
+                message:"Invalid details. Login again",
+            });
         }
         if(!latitude || !longitude){
             return res.status(404).json({
@@ -50,14 +54,28 @@ exports.startAttendance = async(req, res) => {
                 error:error.message,
             });
         }
+
+        const lastSession = await AttendanceSession.findOne()
+            .sort({ createdAt: -1 }) // Sort by latest creation date
+            .select("lectureNo");
+        const lectureNo = lastSession?.lectureNo ? newLecture ? lastSession.lectureNo + 1 : lastSession.lectureNo : 1;
         const reqCourse = await Course.findById(course);
-        console.log(reqCourse.instructor.toString());
+        if(!reqCourse){
+            return res.status(400).json({
+                success:false,
+                message:"Course not found",
+            });
+        }
+        reqCourse.lectureNo = lectureNo;
+        reqCourse.lectures = lectureNo>reqCourse.lectures?lectureNo:reqCourse.lectures;
+        await reqCourse.save();
         if(reqCourse.instructor.toString()!==userId){
             return res.status(404).json({
                 success:false,
                 message:"Course is not yours",
             })
         }
+
     
         // End any existing active sessions for the same course
         await AttendanceSession.updateMany(
@@ -74,12 +92,14 @@ exports.startAttendance = async(req, res) => {
             centerLat: latitude,
             centerLon: longitude,
             instructor:userId,
+            lectureNo,
         });
     
         await session.save();
     
     
         res.status(200).json({
+            success:true,
             message: `Attendance session started for ${duration} minutes.`,
             session,
         });
@@ -171,6 +191,7 @@ exports.markAttendance = async (req, res) => {
     
         if (!isWithin100Meters(latitude, longitude, session.centerLat, session.centerLon)) {
             return res.status(400).json({
+                success:false,
                 message: "User is outside the 100-meter radius. Attendance not marked.",
             });
         } 
@@ -186,13 +207,14 @@ exports.markAttendance = async (req, res) => {
             userId,
             courseId: course,
             date: { $gte: new Date().setUTCHours(0, 0, 0, 0) },
+            lectureNo:session.lectureNo,
+            mark:true,
         });
         if (attendanceExists) {
-            return res.status(400).json(
-                {
-                    error: "Attendance already marked for today." 
-                }
-            );
+            return res.status(400).json({
+                success:false,
+                message:"Attendance already marked present",
+            });
         }
 
         await Attendance.create({
@@ -203,6 +225,7 @@ exports.markAttendance = async (req, res) => {
             branch: user.branch,
             mark: true, // Attendance marked as present
             date: new Date(),
+            lectureNo:session.lectureNo,
         });
 
         return res.status(200).json({ 
@@ -320,12 +343,18 @@ exports.getStudentAttendanceByCourse = async (req, res) => {
             (courseId) => courseId._id.toString() === course.toString()
         );
         if (!enrolledCourse) {
-            return res.status(400).json({ error: "Student is not enrolled in the specified course." });
+            return res.status(400).json({
+                success:false,
+                message:"Student not enrolled in the course. Contact Admin.",
+            });
         }
 
         const courseDetails = await Course.findById(course);
         if (!courseDetails) {
-            return res.status(404).json({ error: "Course not found." });
+            return res.status(404).json({
+                success:false,
+                message:"Course not found",
+            });
         }
 
         const attendanceRecords = await Attendance.find({
@@ -346,16 +375,73 @@ exports.getStudentAttendanceByCourse = async (req, res) => {
 
         normalizedRecords.sort((a, b) => a.date - b.date); // Sort by date
 
+        const percentageAttendance = (trueMarkedCount*100)/(courseDetails.lectureNo);
+
+        const reqAttendanceCount = Math.ceil(0.75*(courseDetails.lectures) - trueMarkedCount);
+
+        const remainingAttendanceNeeded = reqAttendanceCount<0?0:reqAttendanceCount;
+
         res.status(200).json({
             student: `${student.firstName} ${student.lastName}`,
             course: courseDetails.courseName,
             attendance: normalizedRecords,
             noOfPresent: trueMarkedCount,
-            noOfLectures: courseDetails.lectures,
+            noOfLectures:courseDetails.lectureNo,
+            totalLecture: courseDetails.lectures,
+            attendacePercentage:percentageAttendance,
+            neededAttendance:remainingAttendanceNeeded,
         });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Error while fetching student attendance records." });
+        res.status(500).json({
+            success:false,
+            message:"Error while fetching attendance for course",
+            error:error.message,
+        });
     }
 };
+
+//get dates of attendance session
+exports.getLectureDatesByCourse = async (req, res) => {
+    try {
+    const {course} = req.body;
+    // Step 1: Fetch attendance sessions for the course
+    const attendanceSessions = await AttendanceSession.find(
+        { course: course }, // Match the specified course
+        { createdAt: 1, lectureNo: 1 } // Select only the required fields
+    );
+
+    // Step 2: Process the data in-memory to ensure uniqueness and sorting
+    const uniqueSessions = Array.from(
+        new Map(
+            attendanceSessions.map((session) => [
+                `${session.lectureNo}-${session.createdAt.toISOString().split("T")[0]}`, // Unique key: lectureNo + date
+                { date: session.createdAt.toISOString().split("T")[0], lectureNo: session.lectureNo }, // Value
+            ])
+            ).values()
+        );
+
+        // Step 3: Sort by date and lectureNo
+        uniqueSessions.sort((a, b) => {
+            if (a.date !== b.date) return a.date.localeCompare(b.date); // Sort by date
+            return a.lectureNo - b.lectureNo; // Sort by lectureNo within the same date
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Lecture dates fetched successfully",
+            data: uniqueSessions,
+        });
+    } catch (error) {
+        console.error("Error fetching lecture dates:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch lecture dates",
+            error: error.message,
+        });
+    }
+
+};
+
 

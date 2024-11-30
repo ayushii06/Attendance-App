@@ -30,8 +30,14 @@ const attendanceSessionSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-        // index: {expires:'0s'},//TTL Index, auto deletes entry from database after session expiration, space optimisation
+        index:true,
     },
+    lectureNo:{
+        type:Number,
+        required:true,
+    }
 });
+// Compound Index for Day-wise Queries and Optimized Sorting
+attendanceSessionSchema.index({ createdAt: 1, lectureNo: -1 });
 
 module.exports = mongoose.model("AttendanceSession", attendanceSessionSchema);

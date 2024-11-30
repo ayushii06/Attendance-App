@@ -98,6 +98,10 @@ exports.getAllCourses = async (req, res) => {
             .populate({
                 path: "courses",
                 select: "courseName instructor lectures", // Populate specific course fields
+                populate:{
+                    path:"instructor",
+                    select:"firstName lastName",
+                }
             })
             .exec();
 
