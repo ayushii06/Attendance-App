@@ -196,3 +196,32 @@ exports.changePassword = async(req,res)=>{
         })
     }
 }
+
+exports.getInstructor = async(req,res)=>{
+    try{
+        const instructor = await User.find({accountType:'Instructor'}).select('firstName lastName courses').populate(
+            {
+            path:'courses',
+            select:'courseName branch',
+            populate:
+            {
+                path:'branch',
+                select:'name',
+            }
+        }
+
+        );
+        return res.status(200).json({
+            success:true,
+            message:'Instructor fetched successfully',
+            instructor,
+        })
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message:'Error while getting Instructor',
+        })
+    }
+}

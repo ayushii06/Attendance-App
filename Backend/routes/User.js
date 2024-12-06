@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const {login, signUp,sendOTP,changePassword} = require("../controllers/Auth");
+const {login, signUp,sendOTP,changePassword,getInstructor} = require("../controllers/Auth");
 const{auth} = require("../middlewares/auth");
 
 router.post("/login", login);
@@ -20,6 +20,7 @@ router.get("/test",auth,(req,res)=>{
 router.post("/sendOTP",sendOTP);//auth dena hai ki nhi yaha *********
 router.post("/changePassword",auth,changePassword);
 router.post("/login", login);
+router.get("/getInstructor",auth,getInstructor);
 router.post("/signUp", signUp);
 
 
