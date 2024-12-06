@@ -97,7 +97,7 @@ exports.getAllCourses = async (req, res) => {
             .select("name year courses") // Select only specific fields
             .populate({
                 path: "courses",
-                select: "courseName instructor lectures", // Populate specific course fields
+                select: "courseName year courseDescription branch instructor lectures", // Populate specific course fields
                 populate:{
                     path:"instructor",
                     select:"firstName lastName",

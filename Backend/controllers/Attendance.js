@@ -194,7 +194,7 @@ exports.markAttendance = async (req, res) => {
                 success:false,
                 message: "User is outside the 100-meter radius. Attendance not marked.",
             });
-        } 
+        }
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({
@@ -388,7 +388,7 @@ exports.getStudentAttendanceByCourse = async (req, res) => {
             noOfPresent: trueMarkedCount,
             noOfLectures:courseDetails.lectureNo,
             totalLecture: courseDetails.lectures,
-            attendacePercentage:percentageAttendance,
+            attendancePercentage:percentageAttendance,
             neededAttendance:remainingAttendanceNeeded,
         });
     } 
