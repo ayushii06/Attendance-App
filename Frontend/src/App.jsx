@@ -1,36 +1,33 @@
 import { Routes, BrowserRouter, Route } from "react-router-dom";
 import './index.css'
-import Geolocation from "./components/Student/Geolocation";
-import Branch from "./components/dashboard/Branch/Branch";
-import CreateBranch from "./components/dashboard/Branch/CreateBranch";
-import BranchDetails from "./components/dashboard/Branch/BranchDetails";
-import CreateCourse from "./components/dashboard/Course/CreateCourse";
-import GetAllCourses from "./components/dashboard/Course/GetAllCourses";
-import RegisterStudent from "./components/Student/RegisterStudent";
-import Take_Image from "./components/Student/Take_Image";
-import TestData from "./components/Student/MarkAttendance";
-import Navbar from "./components/Navbar";
+import Geolocation from "./pages/Geolocation";
+import Branch from "./components/core/Branch/Branch";
+import CreateBranch from "./components/core/Branch/CreateBranch";
+import BranchDetails from "./components/core/Branch/BranchDetails";
+import CreateCourse from "./components/core/Course/CreateCourse";
+import GetAllCourses from "./components/core/Course/GetAllCourses";
+// import RegisterStudent from "./components/core/Auth/SignUp";
+import Take_Image from "./components/core/attendance/Take_Image";
+import TestData from "./components/core/attendance/MarkAttendance";
+import Navbar from "./components/common/Navbar";
 import Home from './Home'
-import Dashboard from "./components/dashboard/AdminDashBoard";
-import OTP from './components/admin/SignUp/otp'
-import Login from './components/Student/Login'
-import Teacher from "./components/dashboard/Teacher";
-import StudentDashboard from "./components/dashboard/StudentDashboard";
-import Take_Attendance from "./components/attendance/Take_Attendance";
-import TeacherRegister from "./components/teacher/register";
-import { Provider } from "react-redux";
-import { store } from "./reducer/reducer"; 
-import GetAttendance from "./components/attendance/GetAttendance";
-
+import Dashboard from "./components/core/dashboard/AdminDashBoard";
+import VerifyEmail from './pages/VerifyEmail'
+import SignUp from './components/core/Auth/SignUp'
+import Login from './components/core/Auth/Login'
+import Teacher from "./components/core/dashboard/Teacher";
+import StudentDashboard from "./components/core/dashboard/StudentDashboard";
+import Take_Attendance from "./components/core/attendance/Take_Attendance";
+// import TeacherRegister from "./components/core/teacher/register";
+import GetAttendance from "./components/core/attendance/GetAttendance";
+import WebcamCapture from "./pages/VerifyFace";
+import VerifyLocation from "./pages/VerifyLocation";
 
 function App() {
 
   return (
    <>
-   <Provider store={store}>
 
-   
-   <BrowserRouter>
   
    
    <Navbar/>
@@ -41,23 +38,24 @@ function App() {
     <Route exact path='/branch/:branch_id' element={<BranchDetails/>}/>
     <Route exact path = '/create_course' element={<CreateCourse/>}/>
     <Route exact path = '/show_courses' element={<GetAllCourses/>}/>
-    <Route exact path = '/add_student' element={<RegisterStudent/>}/>
+    {/* <Route exact path = '/add_student' element={<RegisterStudent/>}/> */}
     <Route exact path = '/take_image' element={<Take_Image/>}/>
     <Route exact path = '/mark_attendance/:course' element={<TestData/>}/>
     <Route exact path = '/location' element={<Geolocation/>}/>
     <Route exact path = '/admin_dashboard' element={<Dashboard/>}/>
     <Route exact path = '/teacher_dashboard' element={<Teacher/>}/>
     <Route exact path = '/student_dashboard' element={<StudentDashboard/>}/>
-    <Route exact path = '/signup/:role' element={<OTP/>}/>
-    <Route exact path = '/take_attendance' element={<Take_Attendance/>}/>
-    <Route exact path = '/teacher_register' element={<TeacherRegister/>}/>
+    <Route exact path = '/signup' element={<SignUp/>}/>
+    <Route exact path = '/verify-email' element={<VerifyEmail/>}/>
     <Route exact path = '/login' element={<Login/>}/>
+    <Route exact path = '/take_attendance' element={<Take_Attendance/>}/>
+    {/* <Route exact path = '/teacher_register' element={<TeacherRegister/>}/> */}
     <Route exact path = '/getAttendance/:year/:id' element={<GetAttendance/>}/>
-    
+    <Route exact path = '/verify_face/:course' element={<WebcamCapture/>}/>
+    <Route exact path = '/verify_location/:course/:encrypted_id' element={<VerifyLocation/>}/>
 
    </Routes>
-   </BrowserRouter>
-    </Provider>
+ 
 
    </>
   );

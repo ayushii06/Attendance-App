@@ -8,10 +8,16 @@ const branchSlice = createSlice({
     },
     reducers: {
         setBranch: (state, action) => {
-            state.branch = action.payload;
+            state.branch = action.payload
         },
+        getBranches: (state, action) => {
+            state.branch = action.payload
+        },
+        getBranchDetails: (state, action) => {
+            state.branch = action.payload
+        }
     }
 });
 
-export const { setBranch } = branchSlice.actions;
+export const {setBranch,getBranches,getBranchDetails} = branchSlice.actions;
 export default branchSlice.reducer;

@@ -12,5 +12,4 @@ router.post("/getCourseAttendance",auth,isInstructor,getCourseAttendance);
 router.post("/getStudentAttendanceByCourse",auth,isStudent,getStudentAttendanceByCourse);
 router.post("/getLectureDatesByCourse",auth,isInstructor,getLectureDatesByCourse);
 router.post("/getLectureDatesByCourseForStudent",auth,isStudent,getLectureDatesByCourse);
-
 module.exports = router;

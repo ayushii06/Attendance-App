@@ -1,35 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-
 const initialState = {
-    user: null,
-    token: null,
-    isAuthenticated: false,
-    error: null,
-  };
-  
-  const authSlice = createSlice({
-    name: "auth",
-    initialState,
-    reducers: {
-      login: (state, action) => {
-        state.user = action.payload.user; // Assign user object
-        state.token = action.payload.token; // Assign token
-        state.isAuthenticated = true; // Set as authenticated
-        state.error = null; // Clear error
-      },
-      logout: (state) => {
-        state.user = null;
-        state.token = null;
-        state.isAuthenticated = false;
-        state.error = null;
-      },
-      loginError: (state, action) => {
-        state.error = action.payload;
-      },
+  signupData: null,
+  loading: false,
+  token: localStorage.getItem("token") || null,
+};
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState: initialState,
+  reducers: {
+    setSignupData(state, value) {
+      state.signupData = value.payload;
     },
-  });
-  
-  export const { login, logout, loginError } = authSlice.actions;
-  export default authSlice.reducer;
-  
+    setLoading(state, value) {
+      state.loading = value.payload;
+    },
+    setToken(state, value) {
+      state.token = value.payload;
+    },
+  },
+});
+
+export const { setSignupData, setLoading, setToken } = authSlice.actions;
+
+export default authSlice.reducer;
