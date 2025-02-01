@@ -1,5 +1,3 @@
 flask
 numpy
-base64
-json
-cv2
+opencv-python
