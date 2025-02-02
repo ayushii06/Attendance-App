@@ -28,7 +28,7 @@ export async function getCourseAttendance(course, year, branch,token) {
 
         } catch (error) {
             console.log("GET COURSE ATTENDANCE API ERROR............", error)
-            toast.error(error.response?.data?.message||"Failed to Get Course Attendance")
+            // toast.error(error.response?.data?.message||"Failed to Get Course Attendance")
         }
         toast.dismiss(toastId)
         return result
