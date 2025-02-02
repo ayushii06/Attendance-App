@@ -1,4 +1,6 @@
 flask
-numpy
+flask-cors
 gunicorn
-opencv-python
+pymongo
+numpy
+opencv-python-headless
