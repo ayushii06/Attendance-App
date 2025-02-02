@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllCourses } from '../../../services/operations/courseAPI';
 import {getStudentAttendanceByCourse} from '../../../services/operations/attendanceAPI';
-import dateToIST from '../../../utils/dateToIST';
+import dateToIST from '../../../utils/datetoIST';
 
 const StudentDashboard = () => {
     const user = useSelector((state) => state.profile.user);
