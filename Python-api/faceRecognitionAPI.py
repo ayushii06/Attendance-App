@@ -57,6 +57,7 @@ def draw_boundary(img, classifier, scaleFactor, minNeighbors, color, clf):
 def recognize_face():
     try:
         data = request.json
+        print("Received data:", data)
         if "image" not in data:
             return jsonify({"error": "No image data received"}), 400
 
@@ -76,9 +77,9 @@ def recognize_face():
             return jsonify({"error": "Decoded image is empty"}), 400
 
         # Face recognition setup
-        face_classifier = cv2.CascadeClassifier("models/haarcascade_frontalface_default.xml")
+        face_classifier = cv2.CascadeClassifier("Python-api/models/haarcascade_frontalface_default.xml")
         clf = cv2.face.LBPHFaceRecognizer_create()
-        clf.read("models/classifier.xml")
+        clf.read("Python-api/models/classifier.xml")
         color = {"blue": (255, 0, 0)}
 
         coords, verified_face_info = draw_boundary(img, face_classifier, 1.1, 10, color["blue"], clf)
@@ -98,5 +99,5 @@ def recognize_face():
         return jsonify({"error": str(e)}), 500
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)

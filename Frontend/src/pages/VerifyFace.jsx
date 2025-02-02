@@ -46,7 +46,7 @@ function WebcamCapture() {
 
     const sendImageToBackend = async (imageData) => {
         try {
-            const response = await fetch("http://127.0.0.1:5001/recognize", {
+            const response = await fetch("https://attendance-app-b3lg.onrender.com/recognize", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ image: imageData }),
