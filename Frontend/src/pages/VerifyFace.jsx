@@ -52,6 +52,7 @@ function WebcamCapture() {
                 body: JSON.stringify({ image: imageData }),
             });
             const data = await response.json();
+            console.log(data);
             const id = data?.verified_face_info?.roll_no;
 
             if (id !== rollNoCapitalized) {

@@ -4,3 +4,4 @@ gunicorn
 pymongo
 numpy
 opencv-python-headless
+opencv-contrib-python
