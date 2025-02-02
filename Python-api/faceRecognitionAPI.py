@@ -77,9 +77,9 @@ def recognize_face():
             return jsonify({"error": "Decoded image is empty"}), 400
 
         # Face recognition setup
-        face_classifier = cv2.CascadeClassifier("Python-api/models/haarcascade_frontalface_default.xml")
+        face_classifier = cv2.CascadeClassifier("models/haarcascade_frontalface_default.xml")
         clf = cv2.face.LBPHFaceRecognizer_create()
-        clf.read("Python-api/models/classifier.xml")
+        clf.read("models/classifier.xml")
         color = {"blue": (255, 0, 0)}
 
         coords, verified_face_info = draw_boundary(img, face_classifier, 1.1, 10, color["blue"], clf)
