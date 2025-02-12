@@ -5,6 +5,7 @@ const User = require("../models/User");
 //auth
 exports.auth = async (req,res,next)=>{
     try{
+        // console.log(req.cookies.token || req.header("Authorization").replace("Bearer ","") || req.body.token);
         //extract token 
         const token = req.cookies.token || req.header("Authorization").replace("Bearer ","") || req.body.token;
         //if token is not present 

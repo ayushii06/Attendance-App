@@ -1,31 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    course: null,
+    course: [],
 };
   
-  const authSlice = createSlice({
-    name: "auth",
+  const courseSlice = createSlice({
+    name: "course",
     initialState,
     reducers: {
-      login: (state, action) => {
-        state.user = action.payload.user; // Assign user object
-        state.token = action.payload.token; // Assign token
-        state.isAuthenticated = true; // Set as authenticated
-        state.error = null; // Clear error
+      setCourse: (state, action) => {
+        state.course = action.payload;
       },
-      logout: (state) => {
-        state.user = null;
-        state.token = null;
-        state.isAuthenticated = false;
-        state.error = null;
-      },
-      loginError: (state, action) => {
-        state.error = action.payload;
+      getCourses: (state, action) => {
+        state.course = action.payload;
       },
     },
   });
   
-  export const { login, logout, loginError } = authSlice.actions;
-  export default authSlice.reducer;
+  export const { setCourse,getCourses } = courseSlice.actions;
+  export default courseSlice.reducer;
   

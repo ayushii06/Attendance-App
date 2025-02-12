@@ -3,6 +3,8 @@ const Attendance = require("../models/Attendance");
 const AttendanceSession = require("../models/AttendanceSession");
 const Course = require("../models/Course");
 const User = require("../models/User");
+const axios = require("axios");
+
 
 function isWithin100Meters(userLat, userLon, centerLat, centerLon) {
     if(!userLat ||  !userLon || !centerLat || !centerLon){
@@ -32,16 +34,21 @@ function isWithin100Meters(userLat, userLon, centerLat, centerLon) {
     const distance = R * c;
 
     // Check if the distance is within 100 meters
-    return distance <= 100;
+    return distance <= 5000;
 }
 
 // Start Attendance Session
 exports.startAttendance = async(req, res) => {
     try{
         const userId = req.user.id;
+
+        console.log(req.body);
         const { duration,latitude,longitude,course,year,branch,newLecture/*(true/false)*/ } = req.body; // duration in minutes
+
+        const durationInt = parseInt(duration);
+        console.log(typeof duration);
     
-        if (!duration || typeof duration !== "number" || duration <= 0 || !course ||!year || !branch) {
+        if (!duration|| !durationInt|| durationInt <= 0 || !course ||!year || !branch) {
             return res.status(400).json({
                 success:false,
                 message:"Invalid details. Login again",
@@ -87,7 +94,7 @@ exports.startAttendance = async(req, res) => {
         const now = new Date();
         const session = new AttendanceSession({
             isActive: true,
-            expiresAt: new Date(now.getTime() + duration * 60 * 1000),
+            expiresAt: new Date(now.getTime() + durationInt * 60 * 1000),
             course,
             centerLat: latitude,
             centerLon: longitude,
@@ -100,7 +107,7 @@ exports.startAttendance = async(req, res) => {
     
         res.status(200).json({
             success:true,
-            message: `Attendance session started for ${duration} minutes.`,
+            message: `Attendance session started for ${durationInt} minutes.`,
             session,
         });
     }
@@ -116,9 +123,10 @@ exports.startAttendance = async(req, res) => {
 // Update Attendance Session Expiration Time
 exports.updateAttendanceExpiration = async (req, res) => {
     try {
+        
         const { course, newDuration } = req.body; // newDuration is in minutes
-    
-        if (!course || typeof newDuration !== "number" || newDuration <= 0) {
+        const newDurationInt = parseInt(newDuration);
+        if (!course || typeof newDurationInt !== "number" || newDurationInt <= 0) {
             return res.status(400).json({ 
                 success:false,
                 message: "Invalid course ID or duration." 
@@ -136,7 +144,7 @@ exports.updateAttendanceExpiration = async (req, res) => {
 
         // Calculate the new expiration time
         const now = new Date();
-        const newExpiresAt = new Date(now.getTime() + newDuration * 60 * 1000);
+        const newExpiresAt = new Date(now.getTime() + newDurationInt * 60 * 1000);
 
         // Update the session's expiration time
         session.expiresAt = newExpiresAt;
@@ -443,5 +451,4 @@ exports.getLectureDatesByCourse = async (req, res) => {
     }
 
 };
-
 
