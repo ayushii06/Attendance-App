@@ -135,15 +135,12 @@ export function logout(navigate) {
   return (dispatch) => {
     dispatch(setToken(null))
     dispatch(setUser(null))
-    dispatch(resetCart())
     localStorage.removeItem("token")
     localStorage.removeItem("user")
     toast.success("Logged Out")
     navigate("/")
   }
 }
-
-
 
 export function getPasswordResetToken(email , setEmailSent) {
   return async(dispatch) => {

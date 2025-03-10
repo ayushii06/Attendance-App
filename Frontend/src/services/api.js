@@ -1,4 +1,5 @@
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+const PYTHON_BASE_URL = import.meta.env.VITE_PYTHON_BASE_URL;
 
 // AUTH ENDPOINTS
 export const endpoints = {
@@ -35,4 +36,20 @@ export const attendanceEndpoints = {
     GET_LECTURE_DATES_BY_COURSE_API: `${BASE_URL}/attendance/getLectureDatesByCourse`,
     GET_LECTURE_DATES_BY_COURSE_FOR_STUDENT_API: `${BASE_URL}/attendance/getLectureDatesByCourseForStudent`,
     RECOGNIZE_FACE_API: `${BASE_URL}/attendance/recognizeFace`
+}
+
+//RECOGNITION ENDPOINTS
+export const recognitionEndpoints = {
+    START_LIVELINESS_API: `${PYTHON_BASE_URL}/liveness_start`,
+    START_RECOGNITION_API: `${PYTHON_BASE_URL}/recognize`,
+    REGISTER_FACE_API: `${PYTHON_BASE_URL}/register`,
+    CHECK_REGISTERED_FACE_API: `${PYTHON_BASE_URL}/is_registered`,
+}
+
+// SETTINGS PAGE API
+export const settingsEndpoints = {
+    // UPDATE_DISPLAY_PICTURE_API: BASE_URL + "/profile/updateDisplayPicture",
+    UPDATE_PROFILE_API: BASE_URL + "/profile/updateProfile",
+    CHANGE_PASSWORD_API: BASE_URL + "/auth/changepassword",
+    // DELETE_PROFILE_API: BASE_URL + "/profile/deleteProfile",
 }

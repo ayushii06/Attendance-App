@@ -43,8 +43,7 @@ const BranchDetails = () => {
     const res = await getBranchDetail(branchId,token);
     setBranchDetails(res);
     // navigate('/admin/dashboard');
-  }
- 
+  } 
 
   useEffect(() => {
     getBranchDetails();

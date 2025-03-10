@@ -1,1 +1,1 @@
-web: cd Python-api && gunicorn faceRecognitionAPI:app
+web: cd Python-api && gunicorn app:app

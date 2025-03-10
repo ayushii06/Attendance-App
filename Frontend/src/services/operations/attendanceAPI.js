@@ -16,14 +16,14 @@ export async function getCourseAttendance(course, year, branch,token) {
                 branch
             },{
                 'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${token}`
+                Authorization: `Bearer ${token}`
             })
             console.log("GET COURSE ATTENDANCE API RESPONSE............", response)
 
             if (!response.data.success) {
                 throw new Error(response.data.message)
             }
-            toast.success("Course Attendance Fetched Successfully")
+            // toast.success("Course Attendance Fetched Successfully")
             result = response?.data?.normalizedRecords
 
         } catch (error) {
@@ -60,7 +60,7 @@ export async function getLectureDatesByCourse(course, token) {
     return result
 }
 
-export async function markAttendance(course, latitude, longitude,token,navigate) {
+export async function markAttendance(course, latitude, longitude,token,setErrorMessage) {
     const toastId = toast.loading("Loading...")
     let result = false
     try {
@@ -70,22 +70,23 @@ export async function markAttendance(course, latitude, longitude,token,navigate)
             longitude
         }, {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         })
         console.log("MARK ATTENDANCE API RESPONSE............", response)
 
         if (!response.data.success) {
             toast.error(response.data?.message || "Failed to Mark Attendance")
+            setErrorMessage(response.data?.message || "Failed to Mark Attendance")
         }
-        toast.success("Attendance Marked Successfully")
+        // toast.success("Attendance Marked Successfully")
         result = true
     } catch (error) {
         console.log("MARK ATTENDANCE API ERROR............", error)
-        toast.error(error.response?.data?.message || "Failed to Mark Attendance")
-        toast.success("Redirecting to Student Dashboard")
-        setTimeout(() => {
-            navigate(`/student_dashboard`)
-        }, 10000)
+        setErrorMessage(error.response?.data?.message || "Failed to Mark Attendance")
+        toast.error("Redirecting to Student Dashboard")
+        // setTimeout(() => {
+        //     navigate(`/student_dashboard`)
+        // }, 10000)
     }
     toast.dismiss(toastId)
     return result
@@ -108,7 +109,7 @@ export async function startAttendance(duration, latitude, longitude, course, yea
             newLecture: lecture == "true"?true:false,
         }, {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         })
         console.log("START ATTENDANCE API RESPONSE............", response)
 
@@ -160,7 +161,7 @@ export async function stopAttendance(course, year, branch,token) {
             branch
         }, {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         })
         console.log("STOP ATTENDANCE API RESPONSE............", response)
 
@@ -178,7 +179,7 @@ export async function stopAttendance(course, year, branch,token) {
 }
 
 export async function getStudentAttendanceByCourse(courseid, token) {
-    let result = []
+    let result = null;
     const toastId = toast.loading("Loading...")
 
     try {
@@ -192,7 +193,7 @@ export async function getStudentAttendanceByCourse(courseid, token) {
             throw new Error("Could Not Get Student Attendance")
         }
 
-        toast.success("Student Attendance Fetched Successfully")
+        // toast.success("Student Attendance Fetched Successfully")
         result = response?.data
 
     } catch (error) {
@@ -211,7 +212,7 @@ export async function recognizeFace(image,token) {
             image
         }, {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
         })
         console.log("RECOGNIZE FACE API RESPONSE............", response)
 

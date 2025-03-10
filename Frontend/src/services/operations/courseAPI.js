@@ -42,7 +42,7 @@ export const getAllCourses = async (branchId,token) => {
         const response = await apiConnector("POST", GET_ALL_COURSES_API, { branchId },
             {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             }
         )

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { createBranch } from '../../../services/operations/branchAPI'
 
-const CreateBranch = () => {
+const CreateBranch = ({handleModalToggle}) => {
 
   const [credentials, setCredentials] = useState({
     name: '',
@@ -58,7 +58,15 @@ const CreateBranch = () => {
     <div className="items-center py-4 flex justify-center">
       <div className="bg-white w-6/12 px-12 dark:bg-gray-900">
       <div className="py-8 px-4  ">
+        <div className="flex justify-between items-baseline">
       <h2 className="mb-8 text-2xl font-bold text-center text-gray-900 dark:text-white">Add a new Branch</h2>
+      <button
+      onClick={handleModalToggle}
+      className="text-white hover:bg-gray-200 rounded-lg w-8 h-8 flex items-center justify-center"
+      >
+      ×
+  </button>
+  </div>
       <form action="#">
           <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="sm:col-span-2">
@@ -89,6 +97,7 @@ const CreateBranch = () => {
           </button>
           </div>
       </form>
+
   </div>
 </div>
 </div>

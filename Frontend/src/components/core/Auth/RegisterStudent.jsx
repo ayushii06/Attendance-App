@@ -113,7 +113,7 @@ const RegisterStudent = () => {
              
           </div>
           <div className="text-center">
-          <button type="submit" className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-blue rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+          <button type="submit" className="mt-4 text-xs md:text-sm bg-blue-700 hover:bg-blue-800 text-white font-medium rounded-lg px-5 py-2.5">
               Register
           </button>
           </div>

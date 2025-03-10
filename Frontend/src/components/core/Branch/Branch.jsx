@@ -3,20 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { getAllBranches } from '../../../services/operations/branchAPI';
 import { useSelector } from 'react-redux';
+import CreateBranch from './CreateBranch';
 
 const Branch = () => {
   const initialState = [];
-
-  const [branches, setBranches] = useState(initialState);
+ const [branches, setBranches] = useState(initialState);
   const [year, setYear] = useState('1');
   const navigate = useNavigate();
+
+  const [option,setOption] = useState('')
 
   const branchDetails = (branch_id) => {
     navigate(`/branch/${branch_id}`);
   };
 
   const handleCreate = () => {
-    navigate('/create_branch');
+    setOption('create_branch')
+    // navigate('/create_branch');
   };
 
   const desc = '';
@@ -65,8 +68,13 @@ const Branch = () => {
     }
   }, [year]);
 
+  const handleModalToggle = () => {
+    setOption('')
+  }
+
   return (
     <>
+   
       <div className="flex justify-between items-center mx-14">
         <div className="font-bold text-lg">Showing {branches.length} results</div>
         <button
@@ -125,6 +133,16 @@ const Branch = () => {
           </div>
         ))}
       </div>
+      
+
+    {option==='create_branch' && (
+      <div className="fixed top-0 left-0 bg-black bg-opacity-50 z-10 p-4 w-full h-full">
+    
+      <CreateBranch handleModalToggle={handleModalToggle}/>
+      
+  
+  </div>
+    )}
     </>
   );
 };

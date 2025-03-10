@@ -12,7 +12,7 @@ export async function createBranch(name, year, description,token) {
                 year,
                 description
             },{
-                'Authorization':`Bearer ${token}`
+                Authorization:`Bearer ${token}`
             })
             console.log("CREATE BRANCH API RESPONSE............", response)
 
@@ -34,14 +34,14 @@ export async function getAllBranches(year,token) {
     let result = []
     try {
         const response = await apiConnector("POST", GET_ALL_BRANCHES_API, { year },{
-            'Authorization':`Bearer ${token}`
+            Authorization:`Bearer ${token}`
         })
         if (!response?.data?.success) {
             throw new Error("Could Not Fetch Branches")
         }
 
         console.log("GET ALL BRANCHES API RESPONSE............", response)
-        toast.success("Branches Fetched Successfully")
+        // toast.success("Branches Fetched Successfully")
         result = response?.data?.allBranch
 
     } catch (error) {
@@ -58,7 +58,7 @@ export async function getBranchDetail(branchId,token) {
             const response = await apiConnector("POST", GET_BRANCH_DETAILS_API, {
                 branchId
             },{
-                'Authorization':`Bearer ${token}`
+                Authorization:`Bearer ${token}`
             })
             console.log("GET BRANCH DETAILS API RESPONSE............", response)
 
