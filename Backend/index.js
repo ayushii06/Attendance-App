@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
     cors({
-        origin:"http://localhost:5173",
+        origin:"https://attendance-f6mbe82ul-ayushii06s-projects.vercel.app/",
         credentials:true,
     })
 )
