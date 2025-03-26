@@ -1,0 +1,35 @@
+name: Deploy Flask Backend
+
+on:
+  push:
+    branches:
+      - main  # Change this if your default branch is different
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8  # Match your Python version
+
+    - name: Install dependencies
+      run: |
+        cd Python-api
+        pip install -r requirements.txt
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy Flask Backend
+      run: |
+        cd Python-api
+        zip -r api.zip .  # Zip the Flask app
+        az webapp deployment source config-zip --resource-group <resource-group-name> --name <backend-app-name> --src api.zip
