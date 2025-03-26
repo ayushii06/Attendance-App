@@ -51,7 +51,7 @@ jobs:
 
     - name: Install dlib without binary
       run: |
-        pip install dlib==19.22.99 --no-binary dlib
+        pip install dlib==19.23.0 --no-binary dlib
 
     - name: Azure Login
       uses: azure/login@v1
