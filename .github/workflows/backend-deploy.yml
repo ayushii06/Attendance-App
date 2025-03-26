@@ -32,4 +32,4 @@ jobs:
       run: |
         cd Python-api
         zip -r api.zip .  # Zip the Flask app
-        az webapp deployment source config-zip --resource-group <resource-group-name> --name <backend-app-name> --src api.zip
+        az webapp deployment source config-zip --resource-group AttendanceManagement --name ASP-AttendanceManagement-8afb --src api.zip
