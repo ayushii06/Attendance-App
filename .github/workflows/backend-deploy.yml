@@ -48,7 +48,10 @@ jobs:
       run: |
         cd Python-api
         pip install -r requirements.txt
-        pip install dlib==19.22.99 --no-cache-dir
+
+    - name: Install dlib without binary
+      run: |
+        pip install dlib==19.22.99 --no-binary dlib
 
     - name: Azure Login
       uses: azure/login@v1
