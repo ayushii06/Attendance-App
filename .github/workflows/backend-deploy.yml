@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: 3.8  # Changed to 3.8 to avoid dlib errors
 
     - name: Upgrade setuptools and wheel
       run: |
@@ -29,6 +29,7 @@ jobs:
           cmake \
           g++ \
           python3-dev \
+          libboost-all-dev \
           libboost-python-dev \
           libx11-dev \
           libopenblas-dev \
@@ -40,6 +41,10 @@ jobs:
     - name: Pin pybind11 to compatible version
       run: |
         pip install pybind11==2.10.0
+
+    - name: Clear Cache (Optional)
+      run: |
+        sudo rm -rf ~/.cache/pip
 
     - name: Install dependencies
       run: |
