@@ -22,7 +22,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
     cors({
-        origin:"https://attendance-app-roan.vercel.app/",
+        origin:"https://attendance-app-roan.vercel.app",
+        allowedHeaders: ["Content-Type","Authorization"],
+        methods: ["GET","POST","PUT","DELETE"],
         credentials:true,
     })
 )
