@@ -43,6 +43,13 @@ jobs:
       - name: Delay before deployment
         run: sleep 40s
 
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C717C9107EE14EE8819DF96A84A3F249 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_23A37A6046AA457390BA52C13631EE59 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0C142009F41C4BA39CF364CDC7A4D246 }}
+
       - name: Restart Azure App Service
         run: az webapp restart --name facerecog --resource-group AttendanceManagement
 
@@ -65,13 +72,6 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip -d Python-api
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C717C9107EE14EE8819DF96A84A3F249 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_23A37A6046AA457390BA52C13631EE59 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0C142009F41C4BA39CF364CDC7A4D246 }}
 
      
       - name: 'Deploy to Azure Web App'
