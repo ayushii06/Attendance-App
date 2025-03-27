@@ -68,6 +68,5 @@ jobs:
 
     - name: Deploy Flask Backend
       run: |
-        cd Python-api
-        zip -r api.zip .  # Zip the Flask app
+        zip -r api.zip Python-api/* Procfile -x "Python-api/venv/*" "*.git*" ".github/*"
         az webapp deployment source config-zip --resource-group AttendanceManagement --name rgiptAttendance --src api.zip
