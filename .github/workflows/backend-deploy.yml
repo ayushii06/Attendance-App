@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'Python-api/**' 
 
 permissions:
   id-token: write
