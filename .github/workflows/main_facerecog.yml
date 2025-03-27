@@ -41,6 +41,10 @@ jobs:
           name: python-app
           path: release.zip
 
+      - name: Delay before deployment
+        run: sleep 20s
+
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
