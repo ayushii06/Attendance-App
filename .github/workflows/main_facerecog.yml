@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'Python-api/**'
+    
   workflow_dispatch:
 
 jobs:
@@ -71,10 +70,12 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_23A37A6046AA457390BA52C13631EE59 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0C142009F41C4BA39CF364CDC7A4D246 }}
 
+     
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'facerecog'
           slot-name: 'Production'
-          package: 'Python-api'
+          package: 'release.zip'
+          runtime-stack: 'PYTHON|3.9'
