@@ -32,7 +32,7 @@ jobs:
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
-        run: cd Python-api && zip -r ../release.zip . 
+        run: cd Python-api && zip -r ../release.zip . -x "**/__pycache__/*" "**/*.log" "**/venv/*"
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -41,7 +41,10 @@ jobs:
           path: release.zip
 
       - name: Delay before deployment
-        run: sleep 20s
+        run: sleep 40s
+
+      - name: Restart Azure App Service
+        run: az webapp restart --name facerecog --resource-group AttendanceManagement
 
 
   deploy:
@@ -78,4 +81,4 @@ jobs:
           app-name: 'facerecog'
           slot-name: 'Production'
           package: 'release.zip'
-          runtime-stack: 'PYTHON|3.9'
+
