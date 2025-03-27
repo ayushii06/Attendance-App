@@ -57,9 +57,8 @@ jobs:
 
     - name: Install dlib without binary
       run: |
-        pip uninstall dlib
+        pip uninstall -y dlib
         pip install dlib==19.24.6 --no-cache-dir --no-binary dlib
-
 
     - name: Azure Login
       uses: azure/login@v1
@@ -68,7 +67,11 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+    - name: Create ZIP for deployment
+      run: |
+        cd Python-api
+        zip -r ../api.zip .
+
     - name: Deploy Flask Backend
       run: |
-        zip -r api.zip Python-api/* Procfile -x "Python-api/venv/*" "*.git*" ".github/*"
-        az webapp deployment source config-zip --resource-group AttendanceManagement --name rgiptAttendance --src api.zip
+        az webapp deploy --resource-group AttendanceManagement --name rgiptAttendance --src-path api.zip
