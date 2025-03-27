@@ -20,14 +20,42 @@ database.connect();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-    cors({
-        origin:"https://attendance-app-roan.vercel.app",
-        allowedHeaders: ["Content-Type","Authorization"],
-        methods: ["GET","POST","PUT","DELETE"],
-        credentials:true,
-    })
-)
+const corsOptions = {
+    origin: [
+      "https://attendance-app-roan.vercel.app", // Frontend on Vercel
+      "http://localhost:5173", // Optional: Local Development
+      "*", // Allow all origins (if needed temporarily for debugging)
+    ],
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "PATCH",
+      "OPTIONS", // Important for preflight requests
+    ],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+      "headers", // Fix for headers issue
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Headers",
+      "Access-Control-Allow-Methods",
+    ],
+    exposedHeaders: ["Authorization", "Content-Length", "X-Kuma-Revision"], // Optional, if needed
+    credentials: true, // Allow credentials (cookies, etc.)
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  };
+
+
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
+
 app.use(
     fileUpload({
         useTempFiles:true,
