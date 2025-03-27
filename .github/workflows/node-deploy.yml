@@ -23,10 +23,6 @@ jobs:
         cd Backend
         npm install
 
-    - name: Build project
-      run: |
-        cd Backend
-        npm run build
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
