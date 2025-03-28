@@ -80,5 +80,4 @@ jobs:
         with:
           app-name: 'facerecog'
           slot-name: 'Production'
-          package: 'release.zip'
 
