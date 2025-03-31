@@ -13,6 +13,10 @@ export async function isFaceRegistered(rollNo){
         return response?.data?.is_registered
     }
     catch (error) {
+        toast.error("Server error! Unable to check if face is registered.")
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
         console.error("Error checking if face is registered:", error)
         return false
     }
@@ -40,9 +44,9 @@ export async function startLivenessCheck(imageData,setErrorMessage,videoRef,canv
 
         if(response?.data?.error){
             setErrorMessage(response?.data?.error)
-            // setTimeout(() => {
-            //     window.location.reload();
-            // }, 3000);
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         }
 
         const initialNoseX = response?.data?.initial_nose_x
@@ -51,7 +55,6 @@ export async function startLivenessCheck(imageData,setErrorMessage,videoRef,canv
         setTimeout(() => {
             const newImageData = captureFrame(videoRef,canvasRef); // Capture new image
             sendImageToBackend(newImageData, initialNoseX,rollNoCapitalized,setErrorMessage,setStep)
-
         }, 2000);
 
 
@@ -59,13 +62,14 @@ export async function startLivenessCheck(imageData,setErrorMessage,videoRef,canv
     } catch (error) {
         setErrorMessage("Server error! Unable to start liveness check.")
         console.error("Error starting liveness check:", error)
-        // setTimeout(() => {
-        //     window.location.reload();
-        // }, 3000);
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
     }
 }
 
 export async function sendImageToBackend(imageData, initialNoseX,rollNoCapitalized,setErrorMessage,setStep) {
+    console.log("Sending image to backend for recognition...")
     try {
         const response = await apiConnector("POST", START_RECOGNITION_API, {
             image: imageData,
