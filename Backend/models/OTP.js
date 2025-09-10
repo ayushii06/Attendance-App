@@ -30,7 +30,7 @@ OTPSchema.index({ email: 1 }); // Index for faster queries
 //mail to user //db me entry hone se phle
 async function sendVerificationEmail(email,otp){
     try{
-        const mailResponse = await mailSender(email, "Verification Email from Parikshit", emailVerificationTemplate(otp));
+        const mailResponse = await mailSender(email, "Upasthit: SignUp Email ID Verification", emailVerificationTemplate(otp));
         console.log("Email sent Successfully", mailResponse);
     }
     catch(error){

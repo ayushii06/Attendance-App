@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+//change
 const courseSchema = new mongoose.Schema({
     courseName:{
         type:String,
@@ -23,10 +24,10 @@ const courseSchema = new mongoose.Schema({
     whatYouWillLearn:{
         type:String,
     },
-    branch:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Branch"
-    }],
+    // branch:[{
+    //     type:mongoose.Schema.Types.ObjectId,
+    //     ref:"Branch"
+    // }],
     lectures:{
         type:Number,
         required:true,

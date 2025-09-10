@@ -1,4 +1,5 @@
 #root {
+  background: #000;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -10,4 +11,12 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Add this to your index.css or equivalent */
+.form-input {
+  @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+}
+label {
+  @apply text-sm font-medium text-gray-700;
 }

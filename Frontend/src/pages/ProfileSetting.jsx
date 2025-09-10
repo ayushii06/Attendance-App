@@ -1,9 +1,9 @@
-import React from 'react'
+// import React from 'react'
 
-function ProfileSetting() {
-  return (
-    <div>ProfileSetting</div>
-  )
-}
+// function ProfileSetting() {
+//   return (
+//     <div>ProfileSetting</div>
+//   )
+// }
 
-export default ProfileSetting
+// export default ProfileSetting

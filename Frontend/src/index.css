@@ -8,12 +8,20 @@
   font-weight: 400;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background: linear-gradient(317deg, #06cad0, #093fa3, #8a40de);
+  background: white;
   min-height: 100vh;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Add this to your index.css or equivalent */
+.form-input {
+  @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+}
+label {
+  @apply text-sm font-medium text-gray-700;
 }
 
 a {

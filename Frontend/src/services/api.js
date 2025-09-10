@@ -1,27 +1,27 @@
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const PYTHON_BASE_URL = import.meta.env.VITE_PYTHON_BASE_URL;
 
-// AUTH ENDPOINTS
-export const endpoints = {
-    SENDOTP_API: BASE_URL + "/auth/sendOTP",
-    SIGNUP_API: BASE_URL + "/auth/signUp",
-    LOGIN_API: BASE_URL + "/auth/login",
-    RESETPASSTOKEN_API: BASE_URL + "/auth/reset-password-token",
-    RESETPASSWORD_API: BASE_URL + "/auth/reset-password",
-}
+// // AUTH ENDPOINTS
+// export const endpoints = {
+//     SENDOTP_API: BASE_URL + "/auth/sendOTP",
+//     SIGNUP_API: BASE_URL + "/auth/signUp",
+//     LOGIN_API: BASE_URL + "/auth/login",
+//     RESETPASSTOKEN_API: BASE_URL + "/auth/reset-password-token",
+//     RESETPASSWORD_API: BASE_URL + "/auth/reset-password",
+// }
 
-// COURSE ENDPOINTS
-export const courseEndpoints = {
-    CREATE_COURSE_API: BASE_URL + "/course/createCourse",
-    GET_ALL_COURSES_API: BASE_URL + "/course/getAllCourses",
-}
+// // COURSE ENDPOINTS
+// export const courseEndpoints = {
+//     CREATE_COURSE_API: BASE_URL + "/course/createCourse",
+//     GET_ALL_COURSES_API: BASE_URL + "/course/getAllCourses",
+// }
 
-//BRANCH ENDPOINTS
-export const branchEndpoints = {
-    CREATE_BRANCH_API: BASE_URL + "/branch/createBranch",
-    GET_ALL_BRANCHES_API: BASE_URL + "/branch/showAllBranch",
-    GET_BRANCH_DETAILS_API: BASE_URL + "/branch/showBranchDetails",
-}
+// //BRANCH ENDPOINTS
+// export const branchEndpoints = {
+//     CREATE_BRANCH_API: BASE_URL + "/branch/createBranch",
+//     GET_ALL_BRANCHES_API: BASE_URL + "/branch/showAllBranch",
+//     GET_BRANCH_DETAILS_API: BASE_URL + "/branch/showBranchDetails",
+// }
 
 //ATTENDANCE ENDPOINTS
 export const attendanceEndpoints = {
