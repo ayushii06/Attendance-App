@@ -2,6 +2,8 @@ const Course = require("../models/Course");
 const Branch = require("../models/Branch");
 const User = require("../models/User");
 
+//create new course
+//only admin
 exports.createCourse = async (req, res) => {
     try {
         // Extract data from request
@@ -71,22 +73,24 @@ exports.createCourse = async (req, res) => {
         );
 
         // Response
-        return res.status(200).json({
+        return res.status(201).json({
             success: true,
             message: "Course Created Successfully",
             data: newCourse,
         });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Error while creating course:", error);
         return res.status(500).json({
             success: false,
             message: "Error while creating Course",
-            error: error.message,
+            error: error,
         });
     }
 };
 
 //get all courses of a branch
+//anyone can get
 exports.getAllCourses = async (req, res) => {
     try {
         // Extract branch ID from request body
@@ -122,11 +126,13 @@ exports.getAllCourses = async (req, res) => {
                 courses: branchDetails.courses,
             },
         });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Error fetching branch courses:", error);
         return res.status(500).json({
             success: false,
             message: "Error while getting branch courses.",
+            error:error,
         });
     }
 }

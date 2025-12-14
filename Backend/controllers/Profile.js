@@ -78,6 +78,8 @@ exports.deleteAccount = async(req,res)=>{
     }
 }
 
+// get own details
+//anyone can access
 exports.getAllUserDetails = async(req,res)=>{
     try{
         //get id

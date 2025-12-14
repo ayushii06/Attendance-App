@@ -1,6 +1,7 @@
 const Branch = require("../models/Branch");
 
 //create Branch
+//only admin
 exports.createBranch = async (req,res)=>{
     try{
         //fetch data 
@@ -19,7 +20,7 @@ exports.createBranch = async (req,res)=>{
             year:year,
         });
         console.log(branchDetails);
-        return res.status(200).json({
+        return res.status(201).json({
             success:true,
             message:'Branch created Successfully',
             branchDetails: branchDetails
@@ -30,11 +31,13 @@ exports.createBranch = async (req,res)=>{
         return res.status(500).json({
             success:false,
             message:'Error while creating branch',
+            error:error,
         });
     }
 };
 
 //get all branches of required year
+//anyone can access
 exports.showAllBranch = async(req,res)=>{
     try{
         //fetch Data
@@ -50,11 +53,13 @@ exports.showAllBranch = async(req,res)=>{
         return res.status(500).json({
             success:false,
             message:'Error while getting all Branch',
+            error:error,
         });
     }
 }
 
 //get students of required branch and year 
+//anyone can access
 exports.showBranchDetails = async (req, res) => {
     try {
         // Extract branch ID from request body
@@ -84,11 +89,13 @@ exports.showBranchDetails = async (req, res) => {
                 students: branchDetails.student, // Already sorted
             },
         });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Error fetching branch details:", error);
         return res.status(500).json({
             success: false,
             message: "Error while getting branch details.",
+            error:error,
         });
     }
 };

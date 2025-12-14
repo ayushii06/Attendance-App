@@ -6,6 +6,6 @@ const {auth, isAdmin} = require("../middlewares/auth");
 
 router.post("/createCourse",auth,isAdmin,createCourse);
 
-router.post("/getAllCourses",getAllCourses);
+router.post("/getAllCourses",auth,getAllCourses);
 
 module.exports = router;

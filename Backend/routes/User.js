@@ -17,7 +17,7 @@ router.get("/test",auth,(req,res)=>{
     })
 })
 
-router.post("/sendOTP",sendOTP);//auth dena hai ki nhi yaha *********
+router.post("/sendOTP",sendOTP);
 router.post("/changePassword",auth,changePassword);
 router.post("/login", login);
 router.get("/getInstructor",auth,getInstructor);
