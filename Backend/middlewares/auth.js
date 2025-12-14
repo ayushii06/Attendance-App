@@ -5,9 +5,22 @@ const User = require("../models/User");
 //auth
 exports.auth = async (req,res,next)=>{
     try{
-        // console.log(req.cookies.token || req.header("Authorization").replace("Bearer ","") || req.body.token);
+        console.log("here middleware token",req.cookies.token || req.header("Authorization").replace("Bearer ","") || req.body.token);
         //extract token 
-        const token = req.cookies.token || req.header("Authorization").replace("Bearer ","") || req.body.token;
+        let token;
+        if(req.header("Authorization")){
+            token = req.header("Authorization").replace("Bearer ","");
+        }
+        else if(req.body.token){
+            token = req.body.token;
+        }
+        else if(req.cookies.token){
+            token = req.cookies.token;
+        }
+        else{
+            token = null;
+        }
+        console.log("token",token);
         //if token is not present 
         if(!token){
             return res.status(401).json({
@@ -18,7 +31,7 @@ exports.auth = async (req,res,next)=>{
         //verify token 
         try{
             const decode = jwt.verify(token,process.env.JWT_SECRET);
-            console.log(decode);
+            console.log("decode",decode);
             req.user = decode
         }
         catch(error){

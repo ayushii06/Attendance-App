@@ -9,6 +9,7 @@ const Branch = require("../models/Branch");
 exports.sendOTP = async (req, res) => {
     try {
         const { email } = req.body;
+        // CONSOLE.LOG("EMAIL RECEIVED",email);
 
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
@@ -35,7 +36,7 @@ exports.sendOTP = async (req, res) => {
             }
         }
 
-        const otpPayload = {email,otp};
+        const otpPayload = { email, otp };
         //create entry for otp 
         await OTP.create(otpPayload);
 
@@ -84,12 +85,26 @@ exports.signUp = async (req, res) => {
 
         // Process branch details for students
         let branchDetails = null;
+        let courses = [];
+
+        console.log(branch)
         if (accountType === "Student") {
-            branchDetails = await Branch.findOne({ name: branch, year });
+            branchDetails = await Branch.findById(branch);
             if (!branchDetails) {
                 return res.status(400).json({ success: false, message: "Invalid branch or Branch not Updated yet" });
             }
+            // Find the curriculum entry for the student's year and extract the courses.
+            const curriculumEntry = branchDetails.curriculum.find(
+                (c) => c.year === Number(year)
+            );
+
+            if (curriculumEntry) {
+                courses = curriculumEntry.courses;
+            }
         }
+
+
+
 
         // Create user profile
         const profileDetails = await Profile.create({
@@ -111,7 +126,7 @@ exports.signUp = async (req, res) => {
             rollNo: accountType === "Student" ? rollNo : null,
             year: accountType === "Student" ? year : null,
             branch: accountType === "Student" ? branchDetails._id : null,
-            courses: accountType === "Student" ? branchDetails.courses : [],
+            courses: accountType === "Student" ? courses : [],
         });
 
         // Link user to branch
@@ -129,10 +144,10 @@ exports.signUp = async (req, res) => {
 };
 
 //login 
-exports.login = async (req,res)=>{
-    try{
+exports.login = async (req, res) => {
+    try {
         //get data from req.body 
-        const {email,password} = req.body;
+        const { email, password } = req.body;
         //validation of data
         if(!email||!password){
             return res.status(400).json({
@@ -141,7 +156,7 @@ exports.login = async (req,res)=>{
             });
         }
         //fetch user details by email 
-        let user = await User.findOne({email}).populate("additionalDetails");
+        let user = await User.findOne({ email }).populate("additionalDetails");
         // if user doesn't exist
         if(!user){
             return res.status(404).json({
@@ -151,13 +166,13 @@ exports.login = async (req,res)=>{
         }
         //check password and generate jwt
         const payload = {
-            email:user.email,
-            id:user._id,
-            accountType:user.accountType,
+            email: user.email,
+            id: user._id,
+            accountType: user.accountType,
         }
-        if(await bcrypt.compare(password,user.password)){
+        if (await bcrypt.compare(password, user.password)) {
             const token = jwt.sign(payload, process.env.JWT_SECRET, {
-                expiresIn:"2h",
+                expiresIn: "2h",
             });
             user = user.toObject();
             user.token = token;
@@ -165,17 +180,17 @@ exports.login = async (req,res)=>{
 
             //create cookie 
             const options = {
-                expiresIn: new Date(Date.now() + 3*24*60*60*1000),
-                httpOnly:true,
+                expiresIn: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                httpOnly: true,
             }
-            res.cookie("token",token,options).status(200).json({
-                success:true,
+            res.cookie("token", token, options).status(200).json({
+                success: true,
                 token,
                 user,
-                message:'Logged in Successfully',
+                message: 'Logged in Successfully',
             })
         }
-        else{
+        else {
             //incorrect password 
             return res.status(400).json({
                 success:false,
@@ -183,42 +198,55 @@ exports.login = async (req,res)=>{
             })
         }
     }
-    catch(error){
+    catch (error) {
         console.log(error);
         res.status(500).json({
-            success:false,
-            message:'Error while login',
-            error:error,
+            success: false,
+            message: 'Error while login',
         })
     }
 }
 
-exports.getInstructor = async(req,res)=>{
-    try{
-        const instructor = await User.find({accountType:'Instructor'}).select('firstName lastName courses').populate(
+//change password
+
+exports.changePassword = async (req, res) => {
+    try { }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to change password',
+        })
+    }
+}
+
+exports.getInstructor = async (req, res) => {
+    try {
+        const instructor = await User.find({ accountType: 'Instructor' }).select('firstName lastName courses').populate(
             {
-            path:'courses',
-            select:'courseName branch',
-            populate:
-            {
-                path:'branch',
-                select:'name',
+                path: 'courses',
+                select: 'courseName',
+                // populate:
+                // {
+                //     path:'branch',
+                //     select:'name',
+                // }
             }
-        }
+
 
         );
+        console.log("inst", instructor);
         return res.status(200).json({
-            success:true,
-            message:'Instructor fetched successfully',
+            success: true,
+            message: 'Instructor fetched successfully',
             instructor,
         })
     }
-    catch(error){
+    catch (error) {
         console.log(error);
         return res.status(500).json({
-            success:false,
-            message:'Error while getting Instructor',
-            error:error,
+            success: false,
+            message: 'Error while getting Instructor',
         })
     }
 }
