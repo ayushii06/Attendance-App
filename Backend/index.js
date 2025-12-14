@@ -1,6 +1,6 @@
+// index.js
 const express = require("express");
 const app = express();
-
 
 const userRoutes = require("./routes/User");
 const branchRoutes = require("./routes/Branch");
@@ -11,7 +11,7 @@ const faceRoutes = require("./routes/FaceSetup");
 const database = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const {cloudinaryConnect} = require("./config/cloudinary");
+const { cloudinaryConnect } = require("./config/cloudinary");
 const fileUpload = require("express-fileupload");
 require("dotenv").config();
 const { loadModels } = require('./face-api-setup');
@@ -24,11 +24,7 @@ app.use(cookieParser());
 
 // 1. Correct CORS Configuration
 const corsOptions = {
-
-    origin: [
-        "https://attendance-app-roan.vercel.app",
-        "http://localhost:5173",
-    ],
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
     credentials: true,
