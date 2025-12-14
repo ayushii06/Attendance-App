@@ -1,27 +1,36 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Get token from localStorage if it exists
+const token = localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : null;
+
 const initialState = {
-  signupData: null,
+  token: token,
+  user: null,
   loading: false,
-  token: localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    setSignupData(state, value) {
-      state.signupData = value.payload;
+    // Action to set credentials after login
+    setCredentials(state, action) {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      localStorage.setItem("token", JSON.stringify(action.payload.token));
     },
-    setLoading(state, value) {
-      state.loading = value.payload;
+    // Action to log out
+    logout(state) {
+      state.user = null;
+      state.token = null;
+      localStorage.removeItem("token");
     },
-    setToken(state, value) {
-      state.token = value.payload;
+    setLoading(state, action) {
+      state.loading = action.payload;
     },
   },
 });
 
-export const { setSignupData, setLoading, setToken } = authSlice.actions;
+export const { setCredentials, logout, setLoading } = authSlice.actions;
 
 export default authSlice.reducer;

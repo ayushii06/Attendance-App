@@ -68,7 +68,15 @@ const userSchema = new mongoose.Schema({
     
     image: {
         type: String,
-        required: true,
+        // required: true,
+    },
+    isFaceRegistered:{
+        type:Boolean,
+        default:false
+    },
+    faceDescriptor: {
+        type: [Number], // Storing the 128-element array from face-api.js
+        required: false // Not required at initial registration
     },
     token: {
         type: String,

@@ -1,4 +1,5 @@
 #root {
+  background: #000;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -10,4 +11,31 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Add this to your index.css or equivalent */
+.form-input {
+  @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+}
+label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+/* Hide ugly scrollbars */
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6b7280; /* gray-500 */
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563; /* gray-600 */
 }

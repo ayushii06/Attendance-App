@@ -77,12 +77,26 @@ exports.signUp = async (req, res) => {
 
         // Process branch details for students
         let branchDetails = null;
+        let courses = [];
+
+        console.log(branch)
         if (accountType === "Student") {
-            branchDetails = await Branch.findOne({ name: branch, year });
+            branchDetails = await Branch.findById(branch);
             if (!branchDetails) {
                 return res.status(400).json({ success: false, message: "Invalid branch" });
             }
+            // Find the curriculum entry for the student's year and extract the courses.
+            const curriculumEntry = branchDetails.curriculum.find(
+                (c) => c.year === Number(year)
+            );
+
+            if (curriculumEntry) {
+                courses = curriculumEntry.courses;
+            }
         }
+
+
+
 
         // Create user profile
         const profileDetails = await Profile.create({
@@ -104,7 +118,7 @@ exports.signUp = async (req, res) => {
             rollNo: accountType === "Student" ? rollNo : null,
             year: accountType === "Student" ? year : null,
             branch: accountType === "Student" ? branchDetails._id : null,
-            courses: accountType === "Student" ? branchDetails.courses : [],
+            courses: accountType === "Student" ? courses : [],
         });
 
         // Link user to branch
@@ -201,14 +215,15 @@ exports.getInstructor = async(req,res)=>{
     try{
         const instructor = await User.find({accountType:'Instructor'}).select('firstName lastName courses').populate(
             {
-            path:'courses',
-            select:'courseName branch',
-            populate:
-            {
-                path:'branch',
-                select:'name',
+                path: 'courses',
+                select: 'courseName',
+                // populate:
+                // {
+                //     path:'branch',
+                //     select:'name',
+                // }
             }
-        }
+
 
         );
         return res.status(200).json({

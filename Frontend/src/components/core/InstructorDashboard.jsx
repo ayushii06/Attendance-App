@@ -1,0 +1,182 @@
+import { useState } from 'react';
+import iconLogo from '../../../public/logo.png'
+import { toast } from 'react-hot-toast';
+import { FiLogOut } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../slice/authSlice';
+import TakeAttendance from './dashboard/TakeAttendance';
+import ManageAttendanceRecords from './dashboard/ManageAttendanceRecords';
+import ManageTeacherAttendance from './dashboard/ManageAttendanceTeacher';
+
+// --- SVG Icons (to replace react-icons dependency) ---
+const IconGrid = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect>
+      </svg>
+);
+const IconBookOpen = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      </svg>
+);
+const IconUsers = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+);
+const IconChevronsLeft = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline>
+      </svg>
+);
+const IconChevronsRight = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline>
+      </svg>
+);
+
+// --- Component Definitions ---
+
+const Sidebar = ({ user, setActiveComponent, activeComponent, isSidebarCollapsed, setIsSidebarCollapsed }) => {
+      const navItems = [
+            { name: 'Take Attendance', label: 'Take Attendance', icon: IconGrid },
+            { name: 'Attendance Records', label: 'Attendance Records', icon: IconUsers },
+            { name: 'Logout', label: 'Logout', icon: FiLogOut },
+      ];
+
+      return (
+            <aside className={`relative flex flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
+                  <div className={`p-4 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
+                        <div className="bg-indigo-600 p-2 rounded-lg">
+                              <img src={iconLogo} className={`h-12 ${isSidebarCollapsed ? 'w-20' : 'w-auto'} text-white`} />
+                        </div>
+                        <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
+                              <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Dr. {user?.firstName} {user?.lastName}</h1>
+                        </div>
+                  </div>
+
+                  <nav className="mt-6 px-2 flex-grow">
+                        <ul>
+                              {navItems.map((item) => (
+                                    <li key={item.name} className="mb-2">
+                                          <button
+                                                onClick={() => setActiveComponent(item.name)}
+                                                title={item.label}
+                                                className={`flex bg-white focus:outline-none items-center w-full p-3 rounded-lg text-left text-base font-medium transition-colors ${isSidebarCollapsed ? 'justify-center' : ''}
+                                    ${activeComponent === item.name
+                                                            ? 'bg-indigo-100 text-indigo-700'
+                                                            : 'text-gray-600 hover:bg-gray-100'
+                                                      }`
+                                                }
+                                          >
+                                                <item.icon className="h-6 w-6 flex-shrink-0" />
+                                                <span className={`ml-3 whitespace-nowrap ${isSidebarCollapsed ? 'hidden' : 'block'}`}>{item.label}</span>
+                                          </button>
+                                    </li>
+                              ))}
+                        </ul>
+                  </nav>
+
+                  <div className="p-2 border-t border-gray-200">
+                        <button
+                              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                              className="flex items-center focus:outline-none justify-center w-full p-3 rounded-lg text-gray-600 bg-white outline-none border-none hover:bg-gray-100"
+                        >
+                              {isSidebarCollapsed
+                                    ? <IconChevronsRight className="h-6 w-6" title="Show Sidebar" />
+                                    : <div className="flex items-center w-full"><IconChevronsLeft className="h-6 w-6 flex-shrink-0" /><span className="ml-3 whitespace-nowrap">Hide Sidebar</span></div>
+                              }
+                        </button>
+                  </div>
+            </aside>
+      );
+};
+
+const LogoutIcon = (props) => (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+      </svg>
+);
+
+const Logout = () => {
+      const navigate = useNavigate();
+      const dispatch = useDispatch();
+
+      const handleLogout = () => {
+            // Dispatch the logout action to clear the state
+            dispatch(logout());
+
+            // Show a success message
+            toast.success("Logged Out Successfully!");
+
+            // Navigate the user to the login page
+            navigate("/signup");
+      };
+
+
+      return (
+            <>
+                  <div className="text-center flex-row justify-center items-center w-72 mx-auto text-black">
+                        <div className="">Are you sure you want to logout?</div>
+                        <div className="flex justify-center space-x-4 mt-4 items-center">
+                              <button
+                                    onClick={handleLogout}
+                                    className="flex items-center space-x-2 px-4  text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                              >
+                                    <LogoutIcon className="w-5 h-5" />
+                                    <span>Logout</span>
+                              </button>
+                              <button onClick={() => setActiveComponent('DashboardHome')} className=" bg-gray-600 text-white px-4 rounded">Cancel</button>
+                        </div>
+                  </div>
+            </>
+      );
+};
+
+// --- Main Admin Dashboard Component (Updated with Toggle State) ---
+const InstructorDashboard = () => {
+      const [activeComponent, setActiveComponent] = useState('DashboardHome');
+      const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+      const user = useSelector((state) => state.auth.user);
+      console.log("User in InstructorDashboard:", user);
+
+      const renderComponent = () => {
+            switch (activeComponent) {
+                  case 'Take Attendance':
+                        return <TakeAttendance user={user}/>;
+                  // case 'ManageCourses':
+                        // return <ManageCourses />;
+                  case 'Attendance Records':
+                        return <ManageTeacherAttendance user={user}/>;
+                  case 'Logout':
+                        return <Logout />;
+                  default:
+                        return <TakeAttendance user={user} />;
+            }
+      };
+
+
+
+      return (
+            <div className="flex h-screen bg-gray-100 font-sans">
+                  <Sidebar
+                        user={user}
+                        setActiveComponent={setActiveComponent}
+                        activeComponent={activeComponent}
+                        isSidebarCollapsed={isSidebarCollapsed}
+                        setIsSidebarCollapsed={setIsSidebarCollapsed}
+                  />
+                  <main className="flex-1 overflow-y-auto p-8">
+                        {renderComponent()}
+                  </main>
+            </div>
+      );
+};
+
+export default InstructorDashboard;
+

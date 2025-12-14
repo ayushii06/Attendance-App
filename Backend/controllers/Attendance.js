@@ -250,6 +250,53 @@ exports.markAttendance = async (req, res) => {
     }
 };
 
+exports.checkSession = async (req, res) => {
+    try {
+        // Correctly destructure the course from the request body
+        const { course } = req.body;
+        console.log(course);
+
+        // Ensure a course is provided
+        if (!course) {
+            return res.status(400).json({
+                success: false,
+                message: "Course ID is required."
+            });
+        }
+
+        // Fetch the active session for the course
+        const session = await AttendanceSession.findOne({ course, isActive: true });
+        // console.log("Found session:", session);
+
+        // Check if the session exists and is not expired
+        const now = new Date();
+
+        if(!session || now > session.expiresAt) {
+            return res.status(404).json({
+                success: false,
+                message: "Attendance for this course is not available now."
+            });
+        }
+
+        console.log("Session is active and valid.");
+
+        // Success: The session is active and valid
+        return res.status(200).json({ 
+            success: true,
+            expiresAt: session.expiresAt,
+            // The message should reflect the purpose of checking the session
+            message: "Attendance session is active." 
+        });
+    } catch (error) {
+        // Handle unexpected server errors
+        console.error("Server error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+            error: error.message,
+        });
+    }
+};
 
 // Stop Attendance Session
 exports.stopAttendance = async (req, res) => {
