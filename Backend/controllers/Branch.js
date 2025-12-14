@@ -72,7 +72,6 @@ exports.createBranch = async (req, res) => {
 // };
 
 //get all branches of required year
-
 exports.showAllBranch = async(req,res)=>{
     try{
         //fetch Data
@@ -162,6 +161,7 @@ exports.showAllBranch = async(req,res)=>{
         return res.status(500).json({
             success:false,
             message:'Error while getting all Branch',
+            error:error,
         });
     }
 }
@@ -186,6 +186,7 @@ exports.showAllBranch = async(req,res)=>{
 // }
 
 //get students of required branch and year 
+//anyone can access
 exports.showBranchDetails = async (req, res) => {
     try {
         // Extract branch ID from request body
@@ -216,11 +217,13 @@ exports.showBranchDetails = async (req, res) => {
                 students: branchDetails.student, // Already sorted
             },
         });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Error fetching branch details:", error);
         return res.status(500).json({
             success: false,
             message: "Error while getting branch details.",
+            error:error,
         });
     }
 };

@@ -41,9 +41,10 @@ exports.sendOTP = async (req, res) => {
         await OTP.create(otpPayload);
 
         res.status(200).json({ success: true, message: "OTP sent successfully" });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Error sending OTP:", error);
-        res.status(500).json({ success: false, message: "Error sending OTP" });
+        res.status(500).json({ success: false, message: "Error while sending OTP",error:error });
     }
 };
 
@@ -57,6 +58,12 @@ exports.signUp = async (req, res) => {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
+        if(accountType==="Student"){
+            if(!rollNo || !year || !branch){
+                return res.status(400).json({success:false, message : "All Fields are required"});
+            }
+        }
+
         if (password !== confirmPassword) {
             return res.status(400).json({ success: false, message: "Passwords do not match" });
         }
@@ -64,7 +71,7 @@ exports.signUp = async (req, res) => {
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(409).json({ success: false, message: "User already exists" });
+            return res.status(409).json({ success: false, message: "User already exists.Please LogIn" });
         }
 
         // Validate OTP
@@ -84,7 +91,7 @@ exports.signUp = async (req, res) => {
         if (accountType === "Student") {
             branchDetails = await Branch.findById(branch);
             if (!branchDetails) {
-                return res.status(400).json({ success: false, message: "Invalid branch" });
+                return res.status(400).json({ success: false, message: "Invalid branch or Branch not Updated yet" });
             }
             // Find the curriculum entry for the student's year and extract the courses.
             const curriculumEntry = branchDetails.curriculum.find(
@@ -129,9 +136,10 @@ exports.signUp = async (req, res) => {
         }
 
         res.status(201).json({ success: true, message: "User registered successfully" });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Signup Error:", error);
-        res.status(500).json({ success: false, message: "Error signing up user" });
+        res.status(500).json({ success: false, message: "Error signing up user" ,error:error});
     }
 };
 
@@ -141,19 +149,19 @@ exports.login = async (req, res) => {
         //get data from req.body 
         const { email, password } = req.body;
         //validation of data
-        if (!email || !password) {
-            return res.status(403).json({
-                success: false,
-                message: 'Fill all the entries in login',
+        if(!email||!password){
+            return res.status(400).json({
+                success:false,
+                message:'Fill all the entries in login',
             });
         }
         //fetch user details by email 
         let user = await User.findOne({ email }).populate("additionalDetails");
         // if user doesn't exist
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'User Not Exist. Try Signup',
+        if(!user){
+            return res.status(404).json({
+                success:false,
+                message:'User Not Exist. Try Signup',
             });
         }
         //check password and generate jwt
@@ -184,9 +192,9 @@ exports.login = async (req, res) => {
         }
         else {
             //incorrect password 
-            return res.status(401).json({
-                success: false,
-                message: 'Incorrect Password',
+            return res.status(400).json({
+                success:false,
+                message:'Incorrect Password',
             })
         }
     }
