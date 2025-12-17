@@ -50,7 +50,8 @@ const Sidebar = ({ user, setActiveComponent, activeComponent, isSidebarCollapsed
       ];
 
       return (
-            <aside className={`relative flex flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
+            <aside className="hidden md:flex relative flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300
+  ${isSidebarCollapsed ? 'w-20' : 'w-64'}">
                   <div className={`p-4 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
                         <div className="bg-indigo-600 p-2 rounded-lg">
                               <img src={iconLogo} className={`h-12 ${isSidebarCollapsed ? 'w-20' : 'w-auto'} text-white`} />
@@ -102,6 +103,41 @@ const LogoutIcon = (props) => (
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
       </svg>
 );
+
+const MobileBottomTabs = ({ activeComponent, setActiveComponent }) => {
+  const navItems = [
+    
+      { name: 'Take Attendance', label: 'Take Attendance', icon: IconBookOpen },
+      { name: 'Attendance Records', label: 'Records', icon: IconUsers },
+      { name: 'Logout', label: 'Logout', icon: FiLogOut },
+
+  ];
+
+  return (
+    <nav className="fixed pt-2 bottom-0 left-0 right-0 z-50 bg-white border-t shadow md:hidden w-auto">
+      <ul className="flex justify-around">
+        {navItems.map((item) => (
+          <li key={item.name}>
+           <button
+              onClick={() => setActiveComponent(item.name)}
+              className={`flex flex-col items-center w-full text-sm px-2 py-2    bg-white outline-none focus:outline-none focus-visible:outline-none   ${
+                activeComponent === item.name
+                  ? "text-indigo-600 border-indigo-600"
+                  : "text-gray-500"
+              }`}
+            >
+                <item.icon className="w-5 h-5 mb-1 " />
+           {/* <span className="sm:block hidden"> */}
+              {item.label}
+              {/* </span> */}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};
+
 
 const Logout = () => {
       const navigate = useNavigate();
@@ -171,10 +207,15 @@ const InstructorDashboard = () => {
                         isSidebarCollapsed={isSidebarCollapsed}
                         setIsSidebarCollapsed={setIsSidebarCollapsed}
                   />
-                  <main className="flex-1 overflow-y-auto p-8">
-                        {renderComponent()}
-                  </main>
-            </div>
+                 <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8">
+    {renderComponent()}
+  </main>
+
+  <MobileBottomTabs
+    activeComponent={activeComponent}
+    setActiveComponent={setActiveComponent}
+  />
+</div>
       );
 };
 

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import {
-  useGetLectureDatesByCourseMutation,
+  useGetLectureDatesByCourseForStudentMutation,
   useGetStudentAttendanceByCourseMutation,
 } from "../../../services/attendanceApi";
 
@@ -28,7 +28,7 @@ function StudentAttendanceRecords() {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [getStudentAttendance, { isLoading }] =
     useGetStudentAttendanceByCourseMutation();
-  const [getLectureDates] = useGetLectureDatesByCourseMutation();
+  const [getLectureDates] = useGetLectureDatesByCourseForStudentMutation();
 
   const handleFindLectureDates = async (e) => {
     setStatus("Loading");

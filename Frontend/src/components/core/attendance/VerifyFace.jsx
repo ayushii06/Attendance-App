@@ -14,6 +14,8 @@ const getPosition = (options) => {
 
 const VerifyingFace = ({ setStep, course, markAttendance }) => {
   const [verifyFace, { isLoading: isVerifying }] = useVerifyFaceMutation();
+  const [hasError, setHasError] = useState(false);
+
                                                            
   
   const videoRef = useRef(null);
@@ -58,6 +60,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
       }
     } catch (err) {
       console.error("Webcam error:", err);
+      setHasError(true);
       setMessage(`❌ Unable to access webcam: ${err.name || 'Unknown error'}. Please check camera permissions.`);
     } finally {
       setLoading(false);
@@ -97,6 +100,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
       setStep(3);
 
     } catch (error) {
+      setHasError(true);
       let errorMessage = "❌ An error occurred during verification or attendance marking. Please try again.";
       
       // 1. Check for Geolocation Errors (Code 1: DENIED, 2: UNAVAILABLE, 3: TIMEOUT)
@@ -124,13 +128,27 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
 
       console.error("Attendance/Geolocation failed:", error);
       
-      // Set the error message and transition back to step 1
+    // Set the error message and display button to return to step 1
       setMessage(errorMessage);
-      setStep(1); 
+      // setStep(1); 
     } finally {
       setLoading(false);
     }
   };
+
+  const handleRetry = () => {
+  // Stop camera if running
+  if (stream) {
+    stream.getTracks().forEach((track) => track.stop());
+  }
+
+  setStream(null);
+  setCapturedImage(null);
+  setHasError(false);
+  setMessage("Click 'Start Webcam' to begin verification.");
+
+  setStep(1); // 👈 GO BACK TO STEP 1
+};
 
 
   // Capture image and verify
@@ -171,6 +189,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
       
       // Use .unwrap() to throw an error on API failure, caught below
       const response = await verifyFace({ images: [imageDataUrl] }).unwrap();
+      console.log("Face verification response:", response);
 
       if (response.success) {
         setMessage("✅ Face verified successfully! Proceeding to location check.");
@@ -179,10 +198,17 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
         getUserLocationAndMarkAttendance();
 
       } else {
+        setHasError(true);
         setMessage("❌ Face not recognized. Please try again.");
-        setStep(1); // Go back to start
+        
+      
+
+
+        // Show return to step 1 button
+        // setStep(1); // Go back to start
       }
     } catch (error) {
+      setHasError(true);
       console.error("Verification failed:", error);
       let errorMessage = "An error occurred during verification.";
       if (error && error.data && error.data.message) {
@@ -231,7 +257,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
         </div>
 
         {/* Message box */}
-        <div className="text-center font-medium text-base">
+        <div className="text-center text-sm md:text-md font-medium">
           <p
             className={`p-4 rounded-xl transition-all duration-300 ${
               loading || isVerifying
@@ -248,7 +274,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
           <button
             onClick={startWebcam}
             disabled={(!!stream && !capturedImage) || loading || isVerifying}
-            className="px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-full shadow-sm hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-gray-200 text-gray-800 text-xs md:text-md font-semibold rounded-full shadow-sm hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading && message.includes("Starting") ? "Starting..." : "Start Webcam"}
           </button>
@@ -256,10 +282,21 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
           <button
             onClick={captureAndVerify}
             disabled={!stream || loading || isVerifying}
-            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+            className="px-6 py-3 bg-indigo-600 text-white text-xs md:text-md font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
           >
             {(loading && message.includes("Capturing")) || isVerifying ? "Verifying..." : "Capture & Verify"}
           </button>
+
+          {hasError && (
+  <div className="flex justify-center pt-4">
+    <button
+      onClick={handleRetry}
+      className="px-6 py-3 bg-red-600 text-white text-xs md:text-md font-semibold rounded-full shadow hover:bg-red-700 transition"
+    >
+      🔄 Retry Verification
+    </button>
+  </div>
+)}
         </div>
         
         {/* Display Location Debug Info (Optional but useful) */}
