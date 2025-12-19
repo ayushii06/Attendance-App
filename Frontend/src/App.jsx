@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import SignUp from "./pages/SignupPage";
+import SignUpPage from "./pages/SignUpPage";
 import AdminDashboard from "./components/core/dashboard/AdminDashBoard";
 import StudentDashboard from "./components/core/dashboard/StudentDashboard";
 import NotFound from "./pages/NotFound";
@@ -18,8 +18,8 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route exact path="/aboutUs" element={<AboutUs />} />
         <Route exact path="/contactUs" element={<ContactUs />} />
-        <Route exact path="/signup" element={<SignUp isLogin={false} />} />
-        <Route exact path="/login" element={<SignUp isLogin={true} />} />
+        <Route exact path="/signup" element={<SignUpPage isLogin={false} />} />
+        <Route exact path="/login" element={<SignUpPage isLogin={true} />} />
         <Route
           exact
           path="/dashboard/a/:id"

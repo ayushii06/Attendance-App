@@ -1,7 +1,7 @@
 import bgAuth from '../../public/bg-auth.jpg'; // Adjust the image path
-import SignUpForm from '../components/core/auth/SignupForm'; // Import the form component
+import SignUpForm from '../components/core/auth/SignUpForm'; // Import the form component
 
-const SignupPage = ({ isLogin }) => {
+const SignUpPage = ({ isLogin }) => {
   return (
     <div className="flex mx-auto bg-white shadow-xl shadow-black w-[85%]  my-10 rounded-lg overflow-hidden">
       {/* Left Column: Image (Hidden on mobile) */}
@@ -17,7 +17,7 @@ const SignupPage = ({ isLogin }) => {
       {/* It's scrollable in case the form is too long for the screen height */}
       <div className="flex rounded-lg w-full items-center justify-center  p-8 md:w-1/2   ">
         <div className="w-full max-w-2xl">
-  
+
           <SignUpForm isLogin={isLogin}/>
         </div>
       </div>
@@ -25,4 +25,4 @@ const SignupPage = ({ isLogin }) => {
   );
 };
 
-export default SignupPage;
+export default SignUpPage;
