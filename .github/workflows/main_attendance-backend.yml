@@ -36,6 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
 
+     # 🔴 THIS IS THE CRITICAL FIX
+    permissions:
+      id-token: write     # REQUIRED for Azure OIDC login
+      contents: read
+
     steps:
       - name: Download Backend artifact
         uses: actions/download-artifact@v4
@@ -55,3 +60,4 @@ jobs:
           app-name: attendance-backend
           slot-name: Production
           package: .
+
