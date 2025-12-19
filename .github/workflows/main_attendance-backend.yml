@@ -61,5 +61,6 @@ jobs:
         with:
           app-name: 'attendance-backend'
           slot-name: 'Production'
-          package: .
+          package: backend
+
           
