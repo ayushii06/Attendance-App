@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+console.log("VITE_BACKEND_URL =", import.meta.env.VITE_BACKEND_URL);
+console.log("VITE_BACKEND_URL =", BASE_URL);
 
 // Define a base query with dynamic headers
 const baseQuery = fetchBaseQuery({
