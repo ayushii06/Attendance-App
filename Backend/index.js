@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 // 1. Correct CORS Configuration
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: "https://attendance-app-olive.vercel.app/",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
     credentials: true,
