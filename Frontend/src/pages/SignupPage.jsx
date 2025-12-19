@@ -1,5 +1,5 @@
 import bgAuth from '../../public/bg-auth.jpg'; // Adjust the image path
-import SignUpForm from '../components/core/auth/SignUpForm'; // Import the form component
+import SignUpForm from '../components/core/Auth/SignUpForm'; // Import the form component
 
 const SignUpPage = ({ isLogin }) => {
   return (
