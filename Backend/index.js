@@ -63,7 +63,11 @@ app.get("/", (req, res) => {
 
 
 
-app.listen(PORT, async() => {
-    await loadModels();
-    console.log(`App is listening at ${PORT}`);
-});
+async function startServer() {
+  await loadModels();              // ⛔ block here
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+startServer();
