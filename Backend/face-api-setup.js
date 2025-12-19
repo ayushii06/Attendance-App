@@ -16,7 +16,7 @@ faceapi.env.monkeyPatch({
 });
 
 // 2. Model Loading (Assuming this runs when the server starts)
-const MODEL_URL = path.join(__dirname, 'models');
+const MODEL_URL = process.env.MODEL_PATH || path.join(__dirname, '../ML model'); // Adjust the path as necessary
 let isModelsLoaded = false;
 
 const loadModels = async () => {
