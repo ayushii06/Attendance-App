@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import {
   useGetCourseAttendanceMutation,
   useGetLectureDatesByCourseMutation,
-} from "../../../services/attendanceApi";
+} from "../../../../services/attendanceApi";
 import {
   useGetBranchDetailsMutation,
   useGetBranchesByYearMutation,
-} from "../../../services/branchApi";
+} from "../../../../services/branchApi";
 
 function ManageTeacherAttendance({ user }) {
   //course, year, branch,
@@ -61,12 +61,17 @@ function ManageTeacherAttendance({ user }) {
   };
 
   const handleCourseChange = (e) => {
-    setCourse(e.target.value);
-    setYear(course ? courses.find((c) => c._id === e.target.value).year : "");
-    console.log(
-      course ? courses.find((c) => c._id === e.target.value).year : ""
-    );
-    findBranchByYear(year);
+     const selectedCourseId = e.target.value;
+     
+     setCourse(selectedCourseId);
+     console.log("selected course:", selectedCourseId);
+     
+     const selectedCourse = courses.find(c => c._id === selectedCourseId);
+     const selectedYear = selectedCourse?.year || "";
+     
+     setYear(selectedYear);
+     console.log("selected year:", selectedYear);
+     findBranchByYear(selectedYear);
   };
 
   const [students, setStudents] = useState([]);
@@ -115,7 +120,7 @@ function ManageTeacherAttendance({ user }) {
 
       <form
         onSubmit={handleGetAttendanceRecords}
-        className="flex items-end mt-8 gap-4 justify-evenly "
+        className="flex md:flex-nowrap flex-wrap items-end mt-8 gap-4 justify-evenly "
       >
         <div className="md:col-span-1 w-[80%]">
           <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -188,7 +193,7 @@ function ManageTeacherAttendance({ user }) {
             )}
           </select>
         </div>
-        <button type="submit" className="w-[30%]">
+        <button type="submit" className="w-[30%]  rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700">
           Find
         </button>
       </form>

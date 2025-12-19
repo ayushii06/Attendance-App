@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useGetCourseAttendanceMutation } from '../../../services/attendanceApi';
-import { useGetBranchesByYearMutation } from '../../../services/branchApi';
+import { useGetCourseAttendanceMutation } from '../../../../services/attendanceApi';
+import { useGetBranchesByYearMutation } from '../../../../services/branchApi';
 
 function ManageAttendanceRecords({user}) {
   //course, year, branch,

@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignupPage";
-import AdminDashboard from "./components/core/AdminDashBoard";
-import StudentDashboard from "./components/core/StudentDashboard";
+import AdminDashboard from "./components/core/dashboard/AdminDashBoard";
+import StudentDashboard from "./components/core/dashboard/StudentDashboard";
 import NotFound from "./pages/NotFound";
-import InstructorDashboard from "./components/core/InstructorDashboard";
+import InstructorDashboard from "./components/core/dashboard/InstructorDashboard";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import PrivateRoute from "./components/common/PrivateRoute";

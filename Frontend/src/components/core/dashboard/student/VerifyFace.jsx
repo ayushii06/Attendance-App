@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { useVerifyFaceMutation } from "../../../services/faceApi";
+import { useVerifyFaceMutation } from "../../../../services/faceApi";
 
 // Helper function to promisify navigator.geolocation.getCurrentPosition
 const getPosition = (options) => {

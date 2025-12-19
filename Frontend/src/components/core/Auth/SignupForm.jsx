@@ -64,6 +64,8 @@ const SignUpForm = ({isLogin}) => {
                   toast.success("Signup Successful!");
                   //REFRESH WINDOW
                   window.location.reload();
+                  // set IsLogging(true);
+                  isLogging(true);
             } catch (err) {
                   const errorMessage = err.data?.message || 'Signup failed. Please try again.';
                   toast.error(errorMessage);
@@ -231,7 +233,7 @@ const SignUpForm = ({isLogin}) => {
                   <button type="submit" className="w-full rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700">
                         Verify & Create Account
                   </button>
-                  <button type="button" onClick={() => sendOtp(email)} className="text-sm text-blue-600 hover:underline">
+                  <button type="button" onClick={() => sendOtp(email)} className="text-sm bg-white text-blue-600 hover:underline">
                         Resend OTP
                   </button>
             </form>

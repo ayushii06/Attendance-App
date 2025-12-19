@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useCheckSessionMutation } from "../../../services/attendanceApi";
-import { useVerifyFaceMutation } from "../../../services/faceApi";
-import { useGetMarkAttendanceMutation } from "../../../services/attendanceApi";
+import { useCheckSessionMutation } from "../../../../services/attendanceApi";
+import { useVerifyFaceMutation } from "../../../../services/faceApi";
+import { useGetMarkAttendanceMutation } from "../../../../services/attendanceApi";
 import VerifyingFace from "./VerifyFace";
 
 function MarkAttendance({ user }) {

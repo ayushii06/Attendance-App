@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import iconLogo from '../../../public/logo.png'
+import iconLogo from '../../../../public/logo.png'
 import { toast } from 'react-hot-toast';
 import { FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../slice/authSlice';
-import FaceRegistration from './attendance/FaceRegistration';
-import MarkAttendance from './attendance/MarkAttendance';
-import StudentAttendanceRecords from './attendance/StudentAttendanceRecords';
+import { logout } from '../../../slice/authSlice';
+import FaceRegistration from './student/FaceRegistration';
+import MarkAttendance from './student/MarkAttendance';
+import StudentAttendanceRecords from './student/StudentAttendanceRecords';
 
 // --- SVG Icons (to replace react-icons dependency) ---
 const IconGrid = (props) => (

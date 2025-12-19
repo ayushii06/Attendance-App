@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FiArrowLeft, FiArrowRight, FiArrowUp, FiCamera, FiCheckCircle, FiSmile, FiUserX } from 'react-icons/fi';
-import {useCreateFaceEnrollmentMutation} from '../../../services/faceApi'
+import {useCreateFaceEnrollmentMutation} from '../../../../services/faceApi'
 import { UserCheck, RefreshCw, ShieldAlert, PartyPopper } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 

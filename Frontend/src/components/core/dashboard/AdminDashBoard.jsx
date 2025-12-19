@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import iconLogo from "../../../public/logo.png";
+import iconLogo from "../../../../public/logo.png";
 import { toast } from "react-hot-toast";
-import ManageBranches from "./dashboard/admin/ManageBranches";
-import ManageCourses from "./dashboard/admin/ManageCourses";
-import ManageStudents from "./dashboard/admin/ManageStudents";
+import ManageBranches from "./admin/ManageBranches";
+import ManageCourses from "./admin/ManageBranches";
+import ManageStudents from "./admin/ManageStudents";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout } from "../../slice/authSlice";
+import { logout } from "../../../slice/authSlice";
 const IconGrid = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

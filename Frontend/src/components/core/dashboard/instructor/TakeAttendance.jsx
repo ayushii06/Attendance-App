@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useStartAttendanceSessionMutation,useStopAttendanceSessionMutation } from '../../../services/attendanceApi'
-import { useGetBranchesByYearMutation } from '../../../services/branchApi';
+import { useStartAttendanceSessionMutation,useStopAttendanceSessionMutation } from '../../../../services/attendanceApi'
+import { useGetBranchesByYearMutation } from '../../../../services/branchApi';
 import { Check, X } from 'lucide-react';
 
 
@@ -93,9 +93,12 @@ function TakeAttendance({ user }) {
       course: e.target.value,
       year: y,
     }));
+
+    console.log(y);
   
     console.log(formState.course ? courses.find(c => c._id === e.target.value).year : '');
-    findBranchByYear(formState.year);
+    findBranchByYear(y);
+   
   }
 
   // Handle input changes
@@ -140,8 +143,9 @@ function TakeAttendance({ user }) {
   };
 
   const handleStopSession = async() => {
+    const courseId = formState.course;
     try {
-      const response = await stopAttendanceSession(formState.course).unwrap();
+      const response = await stopAttendanceSession({course: courseId}).unwrap();
       console.log('Attendance session stopped:', response);
       setUiState('initial');
       setFormState({
@@ -196,7 +200,7 @@ function TakeAttendance({ user }) {
             <p className="text-sm text-gray-600 text-center">Click the button below to begin an attendance session.</p>
             <button
               onClick={handleStartSession}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700 flex justify-center py-3 px-4 border border-transparent  shadow-sm text-base  focus:outline-none "
             >
               Start Attendance Session
             </button>
@@ -316,7 +320,7 @@ function TakeAttendance({ user }) {
 
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full  rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700flex justify-center py-3 px-4 border border-transparent  shadow-sm "
               >
                 Create Session
               </button>
@@ -335,7 +339,7 @@ function TakeAttendance({ user }) {
 
             <button
               onClick={() => handleStopSession()}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700 flex justify-center py-3 px-4 border border-transparent shadow-sm text-base focus:outline-none "
             >
               Stop Session
             </button>

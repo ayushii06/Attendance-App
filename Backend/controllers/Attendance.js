@@ -329,6 +329,7 @@ exports.stopAttendance = async (req, res) => {
     }
 };
 
+
 // Branch course attendance
 // Only for instructor 
 exports.getCourseAttendance = async (req, res) => {
@@ -443,7 +444,7 @@ exports.getStudentAttendanceByCourse = async (req, res) => {
             noOfPresent: trueMarkedCount,
             noOfLectures:courseDetails.lectureNo,
             totalLecture: courseDetails.lectures,
-            attendancePercentage:percentageAttendance,
+            attendancePercentage:percentageAttendance.toFixed(2),
             neededAttendance:remainingAttendanceNeeded,
         });
     } 

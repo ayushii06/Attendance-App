@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import {
   useGetLectureDatesByCourseForStudentMutation,
   useGetStudentAttendanceByCourseMutation,
-} from "../../../services/attendanceApi";
+} from "../../../../services/attendanceApi";
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -417,7 +417,7 @@ function StudentAttendanceRecords() {
 
         <button
           type="submit"
-          className="w-[30%]"
+          className="w-[30%] rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700"
           disabled={isLoading || courses.length === 0}
         >
           {isLoading ? (
