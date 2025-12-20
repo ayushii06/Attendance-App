@@ -11,6 +11,23 @@ import {useGetBranchesByYearMutation} from '../../../services/branchApi'
 
 const ACCOUNT_TYPE = { STUDENT: "Student", INSTRUCTOR: "Instructor" };
 
+const passwordRules = {
+  minLength: 8,
+  regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/
+};
+
+const validatePassword = (password) => {
+  if (password.length < passwordRules.minLength) {
+    return "Password must be at least 8 characters long";
+  }
+  if (!passwordRules.regex.test(password)) {
+    return "Password must contain uppercase, lowercase, number & special character";
+  }
+  return null;
+};
+
+
+
 const SignUpForm = ({isLogin}) => {
       // const router = useNavigate();
       const [isLogging, setIsLogging] = useState(isLogin);
@@ -33,12 +50,17 @@ const SignUpForm = ({isLogin}) => {
 
       const { firstName, lastName, email, rollNo, year, branch, password, confirmPassword } = formData;
       const handleOnChange = (e) => {
-            console.log(e.target.name, e.target.value)
+            // console.log(e.target.name, e.target.value)
             setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));}
 
       // --- HANDLER FOR THE DETAILS FORM ---
       const handleDetailsSubmit = async (e) => {
             e.preventDefault();
+            const passwordError = validatePassword(password);
+  if (passwordError) {
+    toast.error(passwordError);
+    return;
+  }
             if (password !== confirmPassword) {
                   toast.error("Passwords do not match");
                   return;
@@ -61,11 +83,12 @@ const SignUpForm = ({isLogin}) => {
 
             try {
                   await signUp(signupData).unwrap();
-                  toast.success("Signup Successful!");
-                  //REFRESH WINDOW
-                  window.location.reload();
-                  // set IsLogging(true);
-                  isLogging(true);
+                  toast.success("Signup Successful! Please log in.");
+                  //REFRESH WINDOW after 3 seconds
+
+                  setTimeout(() => {
+                        window.location.reload();
+                  }, 3000);
             } catch (err) {
                   const errorMessage = err.data?.message || 'Signup failed. Please try again.';
                   toast.error(errorMessage);

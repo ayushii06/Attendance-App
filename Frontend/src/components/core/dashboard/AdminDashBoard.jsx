@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import iconLogo from "../../../../public/logo.png";
 import { toast } from "react-hot-toast";
 import ManageBranches from "./admin/ManageBranches";
-import ManageCourses from "./admin/ManageBranches";
+import ManageCourses from "./admin/ManageCourses";
 import ManageStudents from "./admin/ManageStudents";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
