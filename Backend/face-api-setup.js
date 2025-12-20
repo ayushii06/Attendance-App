@@ -22,9 +22,9 @@ let isModelsLoaded = false;
 const loadModels = async () => {
     if (isModelsLoaded) return;
     try {
-        await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
-        await faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_URL);
-        await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
+        await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
         isModelsLoaded = true;
     } catch (error) {
         console.error("Failed to load Face API models:", error);
