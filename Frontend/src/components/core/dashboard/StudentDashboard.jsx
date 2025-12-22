@@ -63,13 +63,13 @@ const Sidebar = ({userName, setActiveComponent, activeComponent, isSidebarCollap
     return (
         <aside className="hidden md:flex relative flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300
   ${isSidebarCollapsed ? 'w-20' : 'w-64'}">
-            <div className={`p-4 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
-                <div className="bg-indigo-600 p-2 rounded-lg">
-                   <img src={iconLogo} className={`h-12 ${isSidebarCollapsed ? 'w-20' : 'w-auto'} text-white`}/>
+            <div className={`flex items-center justify-start`}>
+                <div className="p-2 ">
+                   <img src={iconLogo} className={` ${isSidebarCollapsed ? 'h-12 w-auto' : 'h-24 w-auto'} text-white`}/>
                 </div>
-                <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
+                {/* <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
                     <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Hi, {userName}</h1>
-                </div>
+                </div> */}
             </div>
             
             <nav className="mt-6 px-2 flex-grow">
@@ -113,7 +113,7 @@ const Sidebar = ({userName, setActiveComponent, activeComponent, isSidebarCollap
 // 2. Default Dashboard View Component
 const DashboardHome = ({user}) => (
     <div>
-        <h1 className="text-3xl font-bold text-gray-800">Student Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Hi! {user?.firstName} {user?.lastName}</h1>
         <p className="mt-2 text-gray-600">Welcome back! Select a category from the sidebar to get started.</p>
         <div className="max-w-7xl my-4 mx-auto">
           {/* Profile Card */}
@@ -245,6 +245,7 @@ const StudentDashboard = () => {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const user = useSelector((state) => state.auth.user);
 
+
     const renderComponent = () => {
         switch (activeComponent) {
             case 'MarkAttendance':
@@ -260,7 +261,7 @@ const StudentDashboard = () => {
         }
     };
 
-    console.log("User in Student Dashboard:", user);
+    // console.log("User in Student Dashboard:", user);
 
     const isFaceRegistered = user?.isFaceRegistered;
 

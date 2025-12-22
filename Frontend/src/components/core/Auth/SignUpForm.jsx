@@ -12,13 +12,13 @@ import {useGetBranchesByYearMutation} from '../../../services/branchApi'
 const ACCOUNT_TYPE = { STUDENT: "Student", INSTRUCTOR: "Instructor" };
 
 const passwordRules = {
-  minLength: 8,
-  regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/
+  minLength: 6,
+  regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{6,}$/
 };
 
 const validatePassword = (password) => {
   if (password.length < passwordRules.minLength) {
-    return "Password must be at least 8 characters long";
+    return "Password must be at least 6 characters long";
   }
   if (!passwordRules.regex.test(password)) {
     return "Password must contain uppercase, lowercase, number & special character";
@@ -106,7 +106,7 @@ const SignUpForm = ({isLogin}) => {
             try {
                   const result = await login(loginData).unwrap();
                   toast.success("Login Successful!");
-                  console.log(result)
+                  // console.log(result)
 
                   if (result.user?.accountType === "Student") {
             navigate(`/dashboard/s/${result.user?._id}`);
@@ -116,7 +116,7 @@ const SignUpForm = ({isLogin}) => {
            navigate(`/dashboard/i/${result.user?._id}`);
         } else {
             // Fallback for any other roles or if accountType is missing
-            navigate("/dashboard");
+            navigate("/");
         }
             } catch (err) {
                   const errorMessage = err.data?.message || 'Login failed. Please try again.';
@@ -130,7 +130,7 @@ const SignUpForm = ({isLogin}) => {
             function fetchBranches() {
                   getBranches({ year }).unwrap()
                         .then((data) => {
-                              console.log("Branches for year", year, data);
+                              // console.log("Branches for year", year, data);
                               setBranchList(data);
                         })
                         .catch((error) => {

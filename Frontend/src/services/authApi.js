@@ -31,8 +31,8 @@ export const authApiSlice = apiSlice.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           const { user, token } = data;
-          console.log(user,token,"dbgdb")
           // Dispatch an action to store credentials
+          localStorage.setItem("token", token); // Also store in localStorage to maintain across refreshes
           dispatch(setCredentials({ user, token }));
         } catch (error) {
           console.error('Login failed:', error);

@@ -51,14 +51,14 @@ const Sidebar = ({ user, setActiveComponent, activeComponent, isSidebarCollapsed
       return (
             <aside className="hidden md:flex relative flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300
   ${isSidebarCollapsed ? 'w-20' : 'w-64'}">
-                  <div className={`p-4 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
-                        <div className="bg-indigo-600 p-2 rounded-lg">
-                              <img src={iconLogo} className={`h-12 ${isSidebarCollapsed ? 'w-20' : 'w-auto'} text-white`} />
-                        </div>
-                        <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
-                              <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Dr. {user?.firstName} {user?.lastName}</h1>
-                        </div>
-                  </div>
+                  <div className={`flex items-center justify-start`}>
+                                 <div className="p-2 ">
+                                    <img src={iconLogo} className={` ${isSidebarCollapsed ? 'h-12 w-auto' : 'h-24 w-auto'} text-white`}/>
+                                 </div>
+                                 {/* <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
+                                     <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Hi, {userName}</h1>
+                                 </div> */}
+                             </div>
 
                   <nav className="mt-6 px-2 flex-grow">
                         <ul>
@@ -178,7 +178,7 @@ const InstructorDashboard = () => {
       const [activeComponent, setActiveComponent] = useState('DashboardHome');
       const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
       const user = useSelector((state) => state.auth.user);
-      console.log("User in InstructorDashboard:", user);
+      // console.log("User in InstructorDashboard:", user);
 
       const renderComponent = () => {
             switch (activeComponent) {

@@ -101,30 +101,30 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
 
     } catch (error) {
       setHasError(true);
-      let errorMessage = "❌ An error occurred during verification or attendance marking. Please try again.";
+      let errorMessage = error.message || "An error occurred while marking attendance.";
       
       // 1. Check for Geolocation Errors (Code 1: DENIED, 2: UNAVAILABLE, 3: TIMEOUT)
       // We rely on the 'code' property for robust cross-browser Geolocation error detection.
-      if (error && error.code && typeof error.code === 'number' && error.code >= 1 && error.code <= 3) { 
-        if (error.code === 1) { 
-          errorMessage = "❌ Location access denied. Please allow geolocation to mark attendance.";
-        } else if (error.code === 2) { 
-          errorMessage = "❌ Location unavailable. Check device settings or try moving to a different spot.";
-        } else if (error.code === 3) { 
-          errorMessage = "❌ Failed to get location in time. Ensure you have a strong signal.";
-        }
-      } 
+      // if (error && error.code && typeof error.code === 'number' && error.code >= 1 && error.code <= 3) { 
+      //   if (error.code === 1) { 
+      //     errorMessage = "❌ Location access denied. Please allow geolocation to mark attendance.";
+      //   } else if (error.code === 2) { 
+      //     errorMessage = "❌ Location unavailable. Check device settings or try moving to a different spot.";
+      //   } else if (error.code === 3) { 
+      //     errorMessage = "❌ Failed to get location in time. Ensure you have a strong signal.";
+      //   }
+      // } 
       
       // 2. Check for Attendance API Errors (RTK Query failure)
-      else if (error && error.data) {
-        // Assuming RTK Query error structure for backend failure
-        errorMessage = `❌ Attendance API Error: ${error.data.message || 'Server rejected attendance.'}`;
-      } 
+      // else if (error && error.data) {
+      //   // Assuming RTK Query error structure for backend failure
+      //   errorMessage = `❌ Attendance API Error: ${error.data.message || 'Server rejected attendance.'}`;
+      // } 
       
-      // 3. General Error (e.g., network failure, or other unexpected rejection)
-      else if (error && error.message) {
-         errorMessage = `❌ Error: ${error.message}`;
-      } 
+      // // 3. General Error (e.g., network failure, or other unexpected rejection)
+      // else if (error && error.message) {
+      //    errorMessage = `❌ Error: ${error.message}`;
+      // } 
 
       console.error("Attendance/Geolocation failed:", error);
       
@@ -211,11 +211,13 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
       setHasError(true);
       console.error("Verification failed:", error);
       let errorMessage = "An error occurred during verification.";
-      if (error && error.data && error.data.message) {
-         errorMessage = `❌ Face API Error: ${error.data.message}`;
+      if (error && error.message ) {
+         errorMessage = `❌ Face API Error: ${error.message}`;
       }
       setMessage(errorMessage);
+      setTimeout(() => {
       setStep(1);
+    }, 2000);
     } finally {
       setLoading(false);
     }

@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 // Define a base query with dynamic headers
 const baseQuery = fetchBaseQuery({
-  baseUrl: BASE_URL, // Example: "http://localhost:4000/api/v1"
+  baseUrl: BASE_URL,
   prepareHeaders: (headers, { getState }) => {
     // Get the token from your auth slice or local storage
     const token = getState().auth.token || localStorage.getItem("token");

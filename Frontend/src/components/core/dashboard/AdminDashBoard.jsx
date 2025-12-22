@@ -155,30 +155,14 @@ const Sidebar = ({
       className={`hidden md:flex relative flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300
   ${isSidebarCollapsed ? "w-20" : "w-64"}`}
     >
-      <div
-        className={`p-4 flex items-center ${
-          isSidebarCollapsed ? "justify-center" : "justify-start"
-        }`}
-      >
-        <div className="bg-indigo-600 p-2 rounded-lg">
-          <img
-            src={iconLogo}
-            className={`h-12 ${
-              isSidebarCollapsed ? "w-20" : "w-auto"
-            } text-white`}
-          />
-        </div>
-        <div
-          className={`ml-3 overflow-hidden transition-all ${
-            isSidebarCollapsed ? "w-0" : "w-auto"
-          }`}
-        >
-          <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">
-            RGIPT Admin
-          </h1>
-        </div>
-      </div>
-
+      <div className={`flex items-center justify-start`}>
+                     <div className="p-2 ">
+                        <img src={iconLogo} className={` ${isSidebarCollapsed ? 'h-12 w-auto' : 'h-24 w-auto'} text-white`}/>
+                     </div>
+                     {/* <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
+                         <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Hi, {userName}</h1>
+                     </div> */}
+                 </div>
       <nav className="mt-6 px-2 flex-grow">
         <ul>
           {navItems.map((item) => (
@@ -235,23 +219,8 @@ const DashboardHome = () => (
     <p className="mt-2 text-gray-600">
       Welcome back! Select a category from the sidebar to get started.
     </p>
-    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-gray-700">Total Students</h3>
-        <p className="mt-2 text-3xl font-bold text-gray-900">1,234</p>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-gray-700">Total Faculty</h3>
-        <p className="mt-2 text-3xl font-bold text-gray-900">56</p>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-gray-700">Branches</h3>
-        <p className="mt-2 text-3xl font-bold text-gray-900">8</p>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-gray-700">Courses</h3>
-        <p className="mt-2 text-3xl font-bold text-gray-900">4</p>
-      </div>
+    <div className="mt-8 text-black h-[50vh] w-full flex justify-center items-center">
+     <div className="text-lg md:text-3xl text-black text-center px-12">Welcome Admin! You can manage branches, courses, and students from the sidebar. </div>
     </div>
   </div>
 );

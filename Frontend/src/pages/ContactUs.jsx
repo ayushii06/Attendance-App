@@ -1,15 +1,19 @@
 import React from "react";
+import Navbar from "../components/common/Navbar";
 
 export default function Example() {
     return (
-        <div className="max-w-5xl w-full mx-auto p-10 text-gray-800">
+        <>
+        <Navbar/>
+        
+        <div className="max-w-5xl mt-24 w-full mx-auto p-10 text-gray-800">
             <span className="px-2 py-1 text-xs border border-gray-300 rounded-full">Reach Out To Us</span>
             <h1 className="text-4xl font-bold text-left mt-4">
                 We'd love to Hear From You.
             </h1>
             <p className="text-left mt-4">
                 Or just reach out manually to 
-                <a href="mailto:support@upasthit.com" className="text-indigo-600 hover:underline"> support@upasthit.com</a>
+                <a href="mailto:ayushipal06@gmail.com" className="text-indigo-600 hover:underline"> ayushipal06@gmail.com</a>
             </p>
             <div className="grid md:grid-cols-3 mt-16">
                 <div>
@@ -21,8 +25,8 @@ export default function Example() {
                     </svg>
                     <p className="text-lg font-bold mt-2">Email Support</p>
                     <p className="text-gray-500 mt-1 mb-4">Our team can respond in real time.</p>
-                    <a href="mailto:support@upasthit.com" className="text-indigo-600 font-semibold">
-                        support@upasthit.com
+                    <a href="mailto:ayushipal06@gmail.com" className="text-indigo-600 font-semibold">
+                       ayushipal06@gmail.com
                     </a>
                 </div>
 
@@ -41,5 +45,6 @@ export default function Example() {
                 </div>
             </div>
         </div>
+        </>
     );
 };
