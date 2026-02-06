@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import iconLogo from '../../../public/logo.png'
+import { useState } from 'react';
+import iconLogo from '../../../../public/logo.png'
 import { toast } from 'react-hot-toast';
-import ManageBranches from './dashboard/admin/ManageBranches';
-import ManageCourses from './dashboard/admin/ManageCourses';
-import ManageStudents from './dashboard/admin/ManageStudents';
 import { FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../slice/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../../slice/authSlice';
+import FaceRegistration from './student/FaceRegistration';
+import MarkAttendance from './student/MarkAttendance';
+import StudentAttendanceRecords from './student/StudentAttendanceRecords';
+
+// --- SVG Icons (to replace react-icons dependency) ---
 const IconGrid = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
@@ -33,6 +35,7 @@ const IconUsers = (props) => (
         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
     </svg>
 );
+
 const IconChevronsLeft = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline>
@@ -43,34 +46,30 @@ const IconChevronsRight = (props) => (
         <polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline>
     </svg>
 );
-const LogoutIcon = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-    </svg>
-);
 
 
 // --- Component Definitions ---
 
 // 1. Sidebar Component (Updated with Toggle Functionality)
-const Sidebar = ({ setActiveComponent, activeComponent, isSidebarCollapsed, setIsSidebarCollapsed }) => {
+const Sidebar = ({userName, setActiveComponent, activeComponent, isSidebarCollapsed, setIsSidebarCollapsed }) => {
     const navItems = [
         { name: 'DashboardHome', label: 'Dashboard', icon: IconGrid },
-        { name: 'ManageBranches', label: 'Manage Branches', icon: IconGitBranch },
-        { name: 'ManageCourses', label: 'Manage Courses', icon: IconBookOpen },
-        { name: 'ManageStudents', label: 'Manage Students', icon: IconUsers },
+        { name: 'MarkAttendance', label: 'Mark Attendance', icon: IconGitBranch },
+        { name: 'AttendanceRecords', label: 'Attendance Records', icon: IconBookOpen },
+        { name: 'ManageFaceRegistration', label: 'Manage Face Registration', icon: IconUsers },
         { name: 'Logout', label: 'Logout', icon: FiLogOut },
     ];
 
     return (
-        <aside className={`relative flex flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
-            <div className={`p-4 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
-                <div className="bg-indigo-600 p-2 rounded-lg">
-                   <img src={iconLogo} className={`h-12 ${isSidebarCollapsed ? 'w-20' : 'w-auto'} text-white`}/>
+        <aside className="hidden md:flex relative flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300
+  ${isSidebarCollapsed ? 'w-20' : 'w-64'}">
+            <div className={`flex items-center justify-start`}>
+                <div className="p-2 ">
+                   <img src={iconLogo} className={` ${isSidebarCollapsed ? 'h-12 w-auto' : 'h-24 w-auto'} text-white`}/>
                 </div>
-                <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
-                    <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">RGIPT Admin</h1>
-                </div>
+                {/* <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
+                    <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Hi, {userName}</h1>
+                </div> */}
             </div>
             
             <nav className="mt-6 px-2 flex-grow">
@@ -112,31 +111,61 @@ const Sidebar = ({ setActiveComponent, activeComponent, isSidebarCollapsed, setI
 
 
 // 2. Default Dashboard View Component
-const DashboardHome = () => (
+const DashboardHome = ({user}) => (
     <div>
-        <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Hi! {user?.firstName} {user?.lastName}</h1>
         <p className="mt-2 text-gray-600">Welcome back! Select a category from the sidebar to get started.</p>
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold text-gray-700">Total Students</h3>
-                <p className="mt-2 text-3xl font-bold text-gray-900">1,234</p>
+        <div className="max-w-7xl my-4 mx-auto">
+          {/* Profile Card */}
+          <div className="lg:col-span-1 my-8 bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-200">
+            <div className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+              <span className="text-lg mr-2">👤</span> Profile Details
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold text-gray-700">Total Faculty</h3>
-                <p className="mt-2 text-3xl font-bold text-gray-900">56</p>
+            <div className="space-y-3 text-gray-700">
+              <p className="flex items-center">
+                <span className="font-semibold text-gray-900 mr-2 min-w-[100px]">Name:</span>
+                <span className="flex-1">{user?.firstName} {user?.lastName}</span>
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold text-gray-900 mr-2 min-w-[100px]">Roll No:</span>
+                <span className="flex-1">{user.rollNo}</span>
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold text-gray-900 mr-2 min-w-[100px]">Branch:</span>
+                <span className="flex-1">{user.branch.name}</span>
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold text-gray-900 mr-2 min-w-[100px]">Year:</span>
+                <span className="flex-1">{user.year}</span>
+              </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold text-gray-700">Branches</h3>
-                <p className="mt-2 text-3xl font-bold text-gray-900">8</p>
+          </div>
+
+          {/* Courses Section */}
+          <div className="lg:col-span-2">
+            <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+              <span className="text-lg mr-2">📚</span> Courses Enrolled
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {user.courses.map((course) => (
+                <div
+                  key={course._id}
+                  className="bg-white px-4 py-4 rounded-2xl shadow-md border border-gray-200 transition-transform duration-200 ease-in-out hover:scale-105"
+                >
+                  <h3 className="text-md font-semibold text-gray-900">{course.courseName}</h3>
+                </div>
+              ))}
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold text-gray-700">Courses</h3>
-                <p className="mt-2 text-3xl font-bold text-gray-900">4</p>
-            </div>
+          </div>
         </div>
     </div>
 );
 
+const LogoutIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+    </svg>
+);
 
 const Logout = () => {
     const navigate = useNavigate();
@@ -173,41 +202,91 @@ const Logout = () => {
     );
 };
 
+const MobileBottomTabs = ({ activeComponent, setActiveComponent }) => {
+  const navItems = [
+    { name: 'DashboardHome', label: 'Home', icon: IconGrid },
+    { name: 'MarkAttendance', label: 'Mark', icon: IconGitBranch },
+    { name: 'AttendanceRecords', label: 'Records', icon: IconBookOpen },
+    { name: 'ManageFaceRegistration', label: 'Face', icon: IconUsers },
+    { name: 'Logout', label: 'Logout', icon: FiLogOut },
+  ];
+
+  return (
+    <nav className="fixed pt-2 bottom-0 left-0 right-0 z-50 bg-white border-t shadow md:hidden w-auto">
+      <ul className="flex justify-around">
+        {navItems.map((item) => (
+          <li key={item.name}>
+           <button
+              onClick={() => setActiveComponent(item.name)}
+              className={`flex flex-col items-center w-full text-sm px-2 py-2    bg-white outline-none focus:outline-none focus-visible:outline-none   ${
+                activeComponent === item.name
+                  ? "text-indigo-600 border-indigo-600"
+                  : "text-gray-500"
+              }`}
+            >
+                <item.icon className="w-5 h-5 mb-1 " />
+           <span className="sm:block hidden">
+              {item.label}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};
+
+
+
 
 // --- Main Admin Dashboard Component (Updated with Toggle State) ---
-const AdminDashboard = () => {
+const StudentDashboard = () => {
     const [activeComponent, setActiveComponent] = useState('DashboardHome');
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const user = useSelector((state) => state.auth.user);
+
 
     const renderComponent = () => {
         switch (activeComponent) {
-            case 'ManageBranches':
-                return <ManageBranches />;
-            case 'ManageCourses':
-                return <ManageCourses />;
-            case 'ManageStudents':
-                return <ManageStudents />;
+            case 'MarkAttendance':
+                return <MarkAttendance user={user}/>;
+            case 'AttendanceRecords':
+                return <StudentAttendanceRecords />;
+            case 'ManageFaceRegistration':
+                return <FaceRegistration isFaceRegistered={isFaceRegistered} user_id={user?._id} />;
             case 'Logout':
                 return <Logout />;
             default:
-                return <DashboardHome />;
+                return <DashboardHome user={user} />;
         }
     };
 
+    // console.log("User in Student Dashboard:", user);
+
+    const isFaceRegistered = user?.isFaceRegistered;
+
     return (
         <div className="flex h-screen bg-gray-100 font-sans">
-            <Sidebar 
-                setActiveComponent={setActiveComponent} 
-                activeComponent={activeComponent} 
-                isSidebarCollapsed={isSidebarCollapsed}
-                setIsSidebarCollapsed={setIsSidebarCollapsed}
-            />
-            <main className="flex-1 overflow-y-auto p-8">
-                {renderComponent()}
-            </main>
-        </div>
+  <Sidebar
+    userName={user?.firstName + " " + user?.lastName}
+    setActiveComponent={setActiveComponent}
+    activeComponent={activeComponent}
+    isSidebarCollapsed={isSidebarCollapsed}
+    setIsSidebarCollapsed={setIsSidebarCollapsed}
+  />
+
+  <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8">
+    {renderComponent()}
+  </main>
+
+  <MobileBottomTabs
+    activeComponent={activeComponent}
+    setActiveComponent={setActiveComponent}
+  />
+</div>
+
     );
 };
 
-export default AdminDashboard;
+export default StudentDashboard;
 

@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "../src/pages/Home";
-import SignUp from "./pages/SignupPage";
-import AdminDashboard from "./components/core/AdminDashBoard";
-import StudentDashboard from "./components/core/StudentDashboard";
+import Home from "./pages/Home";
+import SignupPage from "./pages/SignupPage";
+import AdminDashboard from "./components/core/dashboard/AdminDashBoard";
+import StudentDashboard from "./components/core/dashboard/StudentDashboard";
 import NotFound from "./pages/NotFound";
-import InstructorDashboard from "./components/core/InstructorDashboard";
+import InstructorDashboard from "./components/core/dashboard/InstructorDashboard";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import PrivateRoute from "./components/common/PrivateRoute";
@@ -18,8 +18,8 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route exact path="/aboutUs" element={<AboutUs />} />
         <Route exact path="/contactUs" element={<ContactUs />} />
-        <Route exact path="/signup" element={<SignUp isLogin={false} />} />
-        <Route exact path="/login" element={<SignUp isLogin={true} />} />
+        <Route exact path="/signup" element={<SignupPage isLogin={false} />} />
+        <Route exact path="/login" element={<SignupPage isLogin={true} />} />
         <Route
           exact
           path="/dashboard/a/:id"

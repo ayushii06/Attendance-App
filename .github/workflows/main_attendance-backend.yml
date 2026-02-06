@@ -1,0 +1,63 @@
+name: Build and deploy Node.js backend to Azure Web App - attendance-backend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies (Backend)
+        working-directory: Backend
+        run: npm install
+
+      - name: Build backend (if needed)
+        working-directory: Backend
+        run: npm run build --if-present
+
+      - name: Upload Backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-app
+          path: Backend
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+     # 🔴 THIS IS THE CRITICAL FIX
+    permissions:
+      id-token: write     # REQUIRED for Azure OIDC login
+      contents: read
+
+    steps:
+      - name: Download Backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B81CC6E1289F414982B392668EA9D5EB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D8AA9CA369DC4B2B8E985FE9B1B7B833 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_65084D8209BC4E65AE1BA4DD37EE200D }}
+
+      - name: Deploy Backend to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: attendance-backend
+          slot-name: Production
+          package: .
+

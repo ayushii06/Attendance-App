@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import {
-  useGetLectureDatesByCourseMutation,
+  useGetLectureDatesByCourseForStudentMutation,
   useGetStudentAttendanceByCourseMutation,
-} from "../../../services/attendanceApi";
+} from "../../../../services/attendanceApi";
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -28,7 +28,7 @@ function StudentAttendanceRecords() {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [getStudentAttendance, { isLoading }] =
     useGetStudentAttendanceByCourseMutation();
-  const [getLectureDates] = useGetLectureDatesByCourseMutation();
+  const [getLectureDates] = useGetLectureDatesByCourseForStudentMutation();
 
   const handleFindLectureDates = async (e) => {
     setStatus("Loading");
@@ -417,7 +417,7 @@ function StudentAttendanceRecords() {
 
         <button
           type="submit"
-          className="w-[30%]"
+          className="w-[30%] rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700"
           disabled={isLoading || courses.length === 0}
         >
           {isLoading ? (

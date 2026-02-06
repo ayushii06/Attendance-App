@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { useVerifyFaceMutation } from "../../../services/faceApi";
+import { useVerifyFaceMutation } from "../../../../services/faceApi";
 
 // Helper function to promisify navigator.geolocation.getCurrentPosition
 const getPosition = (options) => {
@@ -14,6 +14,8 @@ const getPosition = (options) => {
 
 const VerifyingFace = ({ setStep, course, markAttendance }) => {
   const [verifyFace, { isLoading: isVerifying }] = useVerifyFaceMutation();
+  const [hasError, setHasError] = useState(false);
+
                                                            
   
   const videoRef = useRef(null);
@@ -58,6 +60,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
       }
     } catch (err) {
       console.error("Webcam error:", err);
+      setHasError(true);
       setMessage(`❌ Unable to access webcam: ${err.name || 'Unknown error'}. Please check camera permissions.`);
     } finally {
       setLoading(false);
@@ -97,40 +100,55 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
       setStep(3);
 
     } catch (error) {
-      let errorMessage = "❌ An error occurred during verification or attendance marking. Please try again.";
+      setHasError(true);
+      let errorMessage = error.message || "An error occurred while marking attendance.";
       
       // 1. Check for Geolocation Errors (Code 1: DENIED, 2: UNAVAILABLE, 3: TIMEOUT)
       // We rely on the 'code' property for robust cross-browser Geolocation error detection.
-      if (error && error.code && typeof error.code === 'number' && error.code >= 1 && error.code <= 3) { 
-        if (error.code === 1) { 
-          errorMessage = "❌ Location access denied. Please allow geolocation to mark attendance.";
-        } else if (error.code === 2) { 
-          errorMessage = "❌ Location unavailable. Check device settings or try moving to a different spot.";
-        } else if (error.code === 3) { 
-          errorMessage = "❌ Failed to get location in time. Ensure you have a strong signal.";
-        }
-      } 
+      // if (error && error.code && typeof error.code === 'number' && error.code >= 1 && error.code <= 3) { 
+      //   if (error.code === 1) { 
+      //     errorMessage = "❌ Location access denied. Please allow geolocation to mark attendance.";
+      //   } else if (error.code === 2) { 
+      //     errorMessage = "❌ Location unavailable. Check device settings or try moving to a different spot.";
+      //   } else if (error.code === 3) { 
+      //     errorMessage = "❌ Failed to get location in time. Ensure you have a strong signal.";
+      //   }
+      // } 
       
       // 2. Check for Attendance API Errors (RTK Query failure)
-      else if (error && error.data) {
-        // Assuming RTK Query error structure for backend failure
-        errorMessage = `❌ Attendance API Error: ${error.data.message || 'Server rejected attendance.'}`;
-      } 
+      // else if (error && error.data) {
+      //   // Assuming RTK Query error structure for backend failure
+      //   errorMessage = `❌ Attendance API Error: ${error.data.message || 'Server rejected attendance.'}`;
+      // } 
       
-      // 3. General Error (e.g., network failure, or other unexpected rejection)
-      else if (error && error.message) {
-         errorMessage = `❌ Error: ${error.message}`;
-      } 
+      // // 3. General Error (e.g., network failure, or other unexpected rejection)
+      // else if (error && error.message) {
+      //    errorMessage = `❌ Error: ${error.message}`;
+      // } 
 
       console.error("Attendance/Geolocation failed:", error);
       
-      // Set the error message and transition back to step 1
+    // Set the error message and display button to return to step 1
       setMessage(errorMessage);
-      setStep(1); 
+      // setStep(1); 
     } finally {
       setLoading(false);
     }
   };
+
+  const handleRetry = () => {
+  // Stop camera if running
+  if (stream) {
+    stream.getTracks().forEach((track) => track.stop());
+  }
+
+  setStream(null);
+  setCapturedImage(null);
+  setHasError(false);
+  setMessage("Click 'Start Webcam' to begin verification.");
+
+  setStep(1); // 👈 GO BACK TO STEP 1
+};
 
 
   // Capture image and verify
@@ -171,6 +189,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
       
       // Use .unwrap() to throw an error on API failure, caught below
       const response = await verifyFace({ images: [imageDataUrl] }).unwrap();
+      console.log("Face verification response:", response);
 
       if (response.success) {
         setMessage("✅ Face verified successfully! Proceeding to location check.");
@@ -179,17 +198,26 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
         getUserLocationAndMarkAttendance();
 
       } else {
+        setHasError(true);
         setMessage("❌ Face not recognized. Please try again.");
-        setStep(1); // Go back to start
+        
+      
+
+
+        // Show return to step 1 button
+        // setStep(1); // Go back to start
       }
     } catch (error) {
+      setHasError(true);
       console.error("Verification failed:", error);
       let errorMessage = "An error occurred during verification.";
-      if (error && error.data && error.data.message) {
-         errorMessage = `❌ Face API Error: ${error.data.message}`;
+      if (error && error.message ) {
+         errorMessage = `❌ Face API Error: ${error.message}`;
       }
       setMessage(errorMessage);
+      setTimeout(() => {
       setStep(1);
+    }, 2000);
     } finally {
       setLoading(false);
     }
@@ -231,7 +259,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
         </div>
 
         {/* Message box */}
-        <div className="text-center font-medium text-base">
+        <div className="text-center text-sm md:text-md font-medium">
           <p
             className={`p-4 rounded-xl transition-all duration-300 ${
               loading || isVerifying
@@ -248,7 +276,7 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
           <button
             onClick={startWebcam}
             disabled={(!!stream && !capturedImage) || loading || isVerifying}
-            className="px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-full shadow-sm hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-gray-200 text-gray-800 text-xs md:text-md font-semibold rounded-full shadow-sm hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading && message.includes("Starting") ? "Starting..." : "Start Webcam"}
           </button>
@@ -256,10 +284,21 @@ const VerifyingFace = ({ setStep, course, markAttendance }) => {
           <button
             onClick={captureAndVerify}
             disabled={!stream || loading || isVerifying}
-            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+            className="px-6 py-3 bg-indigo-600 text-white text-xs md:text-md font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
           >
             {(loading && message.includes("Capturing")) || isVerifying ? "Verifying..." : "Capture & Verify"}
           </button>
+
+          {hasError && (
+  <div className="flex justify-center pt-4">
+    <button
+      onClick={handleRetry}
+      className="px-6 py-3 bg-red-600 text-white text-xs md:text-md font-semibold rounded-full shadow hover:bg-red-700 transition"
+    >
+      🔄 Retry Verification
+    </button>
+  </div>
+)}
         </div>
         
         {/* Display Location Debug Info (Optional but useful) */}

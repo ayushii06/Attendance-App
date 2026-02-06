@@ -21,10 +21,10 @@ export const attendanceApiSlice = apiSlice.injectEndpoints({
     }),
 
     stopAttendanceSession: builder.mutation({
-      query: (body) => ({
+      query: (course) => ({
         url: "/attendance/stopAttendance",
         method: "POST",
-        body: body,
+        body: course,
       }),
       transformResponse: (response) => response,
     }),

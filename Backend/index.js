@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 // 1. Correct CORS Configuration
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: "https://attendance-app-olive.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
     credentials: true,
@@ -63,7 +63,11 @@ app.get("/", (req, res) => {
 
 
 
-app.listen(PORT, async() => {
-    await loadModels();
-    console.log(`App is listening at ${PORT}`);
-});
+async function startServer() {
+  await loadModels();              // ⛔ block here
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+startServer();

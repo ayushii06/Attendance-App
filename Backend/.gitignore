@@ -18,5 +18,6 @@ models/tiny_face_detector_model-weights_manifest.json
 models/mtcnn_model-shard1
 models/mtcnn_model-weights_manifest.json
 models/ssd_mobilenetv1_model-shard2
+models/face_landmark_68_tiny_model-shard1
 
 

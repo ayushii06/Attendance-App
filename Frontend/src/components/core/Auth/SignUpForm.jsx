@@ -11,6 +11,23 @@ import {useGetBranchesByYearMutation} from '../../../services/branchApi'
 
 const ACCOUNT_TYPE = { STUDENT: "Student", INSTRUCTOR: "Instructor" };
 
+const passwordRules = {
+  minLength: 6,
+  regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{6,}$/
+};
+
+const validatePassword = (password) => {
+  if (password.length < passwordRules.minLength) {
+    return "Password must be at least 6 characters long";
+  }
+  if (!passwordRules.regex.test(password)) {
+    return "Password must contain uppercase, lowercase, number & special character";
+  }
+  return null;
+};
+
+
+
 const SignUpForm = ({isLogin}) => {
       // const router = useNavigate();
       const [isLogging, setIsLogging] = useState(isLogin);
@@ -33,12 +50,17 @@ const SignUpForm = ({isLogin}) => {
 
       const { firstName, lastName, email, rollNo, year, branch, password, confirmPassword } = formData;
       const handleOnChange = (e) => {
-            console.log(e.target.name, e.target.value)
+            // console.log(e.target.name, e.target.value)
             setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));}
 
       // --- HANDLER FOR THE DETAILS FORM ---
       const handleDetailsSubmit = async (e) => {
             e.preventDefault();
+            const passwordError = validatePassword(password);
+  if (passwordError) {
+    toast.error(passwordError);
+    return;
+  }
             if (password !== confirmPassword) {
                   toast.error("Passwords do not match");
                   return;
@@ -61,9 +83,12 @@ const SignUpForm = ({isLogin}) => {
 
             try {
                   await signUp(signupData).unwrap();
-                  toast.success("Signup Successful!");
-                  //REFRESH WINDOW
-                  window.location.reload();
+                  toast.success("Signup Successful! Please log in.");
+                  //REFRESH WINDOW after 3 seconds
+
+                  setTimeout(() => {
+                        window.location.reload();
+                  }, 3000);
             } catch (err) {
                   const errorMessage = err.data?.message || 'Signup failed. Please try again.';
                   toast.error(errorMessage);
@@ -81,7 +106,7 @@ const SignUpForm = ({isLogin}) => {
             try {
                   const result = await login(loginData).unwrap();
                   toast.success("Login Successful!");
-                  console.log(result)
+                  // console.log(result)
 
                   if (result.user?.accountType === "Student") {
             navigate(`/dashboard/s/${result.user?._id}`);
@@ -91,7 +116,7 @@ const SignUpForm = ({isLogin}) => {
            navigate(`/dashboard/i/${result.user?._id}`);
         } else {
             // Fallback for any other roles or if accountType is missing
-            navigate("/dashboard");
+            navigate("/");
         }
             } catch (err) {
                   const errorMessage = err.data?.message || 'Login failed. Please try again.';
@@ -105,7 +130,7 @@ const SignUpForm = ({isLogin}) => {
             function fetchBranches() {
                   getBranches({ year }).unwrap()
                         .then((data) => {
-                              console.log("Branches for year", year, data);
+                              // console.log("Branches for year", year, data);
                               setBranchList(data);
                         })
                         .catch((error) => {
@@ -231,7 +256,7 @@ const SignUpForm = ({isLogin}) => {
                   <button type="submit" className="w-full rounded-lg bg-gray-800 p-3 font-semibold text-white hover:bg-gray-700">
                         Verify & Create Account
                   </button>
-                  <button type="button" onClick={() => sendOtp(email)} className="text-sm text-blue-600 hover:underline">
+                  <button type="button" onClick={() => sendOtp(email)} className="text-sm bg-white text-blue-600 hover:underline">
                         Resend OTP
                   </button>
             </form>

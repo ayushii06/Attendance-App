@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import iconLogo from '../../../public/logo.png'
+import iconLogo from '../../../../public/logo.png'
 import { toast } from 'react-hot-toast';
 import { FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../slice/authSlice';
-import TakeAttendance from './dashboard/TakeAttendance';
-import ManageAttendanceRecords from './dashboard/ManageAttendanceRecords';
-import ManageTeacherAttendance from './dashboard/ManageAttendanceTeacher';
+import { logout } from '../../../slice/authSlice';
+import TakeAttendance from './instructor/TakeAttendance';
+import ManageTeacherAttendance from './instructor/ManageAttendanceTeacher';
 
 // --- SVG Icons (to replace react-icons dependency) ---
 const IconGrid = (props) => (
@@ -50,15 +49,16 @@ const Sidebar = ({ user, setActiveComponent, activeComponent, isSidebarCollapsed
       ];
 
       return (
-            <aside className={`relative flex flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
-                  <div className={`p-4 flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
-                        <div className="bg-indigo-600 p-2 rounded-lg">
-                              <img src={iconLogo} className={`h-12 ${isSidebarCollapsed ? 'w-20' : 'w-auto'} text-white`} />
-                        </div>
-                        <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
-                              <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Dr. {user?.firstName} {user?.lastName}</h1>
-                        </div>
-                  </div>
+            <aside className="hidden md:flex relative flex-col bg-white shadow-md flex-shrink-0 transition-all duration-300
+  ${isSidebarCollapsed ? 'w-20' : 'w-64'}">
+                  <div className={`flex items-center justify-start`}>
+                                 <div className="p-2 ">
+                                    <img src={iconLogo} className={` ${isSidebarCollapsed ? 'h-12 w-auto' : 'h-24 w-auto'} text-white`}/>
+                                 </div>
+                                 {/* <div className={`ml-3 overflow-hidden transition-all ${isSidebarCollapsed ? 'w-0' : 'w-auto'}`}>
+                                     <h1 className="text-xl font-bold text-indigo-600 whitespace-nowrap">Hi, {userName}</h1>
+                                 </div> */}
+                             </div>
 
                   <nav className="mt-6 px-2 flex-grow">
                         <ul>
@@ -103,6 +103,41 @@ const LogoutIcon = (props) => (
       </svg>
 );
 
+const MobileBottomTabs = ({ activeComponent, setActiveComponent }) => {
+  const navItems = [
+    
+      { name: 'Take Attendance', label: 'Take Attendance', icon: IconBookOpen },
+      { name: 'Attendance Records', label: 'Records', icon: IconUsers },
+      { name: 'Logout', label: 'Logout', icon: FiLogOut },
+
+  ];
+
+  return (
+    <nav className="fixed pt-2 bottom-0 left-0 right-0 z-50 bg-white border-t shadow md:hidden w-auto">
+      <ul className="flex justify-around">
+        {navItems.map((item) => (
+          <li key={item.name}>
+           <button
+              onClick={() => setActiveComponent(item.name)}
+              className={`flex flex-col items-center w-full text-sm px-2 py-2    bg-white outline-none focus:outline-none focus-visible:outline-none   ${
+                activeComponent === item.name
+                  ? "text-indigo-600 border-indigo-600"
+                  : "text-gray-500"
+              }`}
+            >
+                <item.icon className="w-5 h-5 mb-1 " />
+           {/* <span className="sm:block hidden"> */}
+              {item.label}
+              {/* </span> */}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};
+
+
 const Logout = () => {
       const navigate = useNavigate();
       const dispatch = useDispatch();
@@ -143,7 +178,7 @@ const InstructorDashboard = () => {
       const [activeComponent, setActiveComponent] = useState('DashboardHome');
       const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
       const user = useSelector((state) => state.auth.user);
-      console.log("User in InstructorDashboard:", user);
+      // console.log("User in InstructorDashboard:", user);
 
       const renderComponent = () => {
             switch (activeComponent) {
@@ -171,10 +206,15 @@ const InstructorDashboard = () => {
                         isSidebarCollapsed={isSidebarCollapsed}
                         setIsSidebarCollapsed={setIsSidebarCollapsed}
                   />
-                  <main className="flex-1 overflow-y-auto p-8">
-                        {renderComponent()}
-                  </main>
-            </div>
+                 <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8">
+    {renderComponent()}
+  </main>
+
+  <MobileBottomTabs
+    activeComponent={activeComponent}
+    setActiveComponent={setActiveComponent}
+  />
+</div>
       );
 };
 
